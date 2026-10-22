@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluación N° 1 · Pat down, detector manual y equipaje · APR 2</title>
+<style>
+  :root{
+    --azul:#0b3a6e; --azul2:#1456a0; --celeste:#e8f0fb; --ok:#1b8a4b; --mal:#c0392b;
+    --gris:#5b6675; --borde:#d5dce6; --fondo:#f4f6fa;
+    --n4:#1b8a4b; --n3:#6aa84f; --n2:#e69f00; --n1:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:#1d2733}
+  header{background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;padding:18px 16px}
+  header h1{margin:0;font-size:1.2rem}
+  header p{margin:4px 0 0;font-size:.82rem;opacity:.85}
+  main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
+  .card{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .card h2{margin:0 0 12px;font-size:1.05rem;color:var(--azul)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--gris);gap:4px}
+  input[type=text],input[type=email],input[type=datetime-local],select,textarea{
+    padding:9px;border:1px solid var(--borde);border-radius:8px;font:inherit;color:#1d2733;background:#fff;width:100%}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--azul2);border-color:transparent}
+  textarea{min-height:70px;resize:vertical}
+  .hint{font-size:.78rem;color:var(--gris)}
+  button{font:inherit;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:7px 11px;cursor:pointer}
+  button:hover{background:var(--celeste)}
+  button.act{background:var(--azul);color:#fff;border-color:var(--azul)}
+  button.primary{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:600;padding:12px 22px;font-size:1rem}
+  button.primary:disabled{opacity:.55;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .score{position:sticky;top:0;z-index:20;background:#fff;border:1px solid var(--borde);border-radius:12px;padding:10px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .score b{font-size:1.25rem;color:var(--azul)}
+  .score small{display:block;color:var(--gris);font-size:.7rem}
+  .bar{flex:1;min-width:120px;height:10px;background:#e3e8ef;border-radius:6px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .2s}
+  #alertaCritica{display:none;background:#fdeeee;border:1px solid #f1c3be;color:var(--mal);padding:10px 14px;border-radius:10px;font-size:.85rem;font-weight:600}
+  /* integrantes */
+  .integ{display:grid;grid-template-columns:28px 1.3fr 1.3fr 1fr 34px;gap:8px;align-items:center;margin-bottom:8px}
+  .integ span.n{font-weight:700;color:var(--azul);text-align:center}
+  @media(max-width:700px){.integ{grid-template-columns:24px 1fr 34px}.integ .c2,.integ .c3{grid-column:2/3}}
+  /* escenario */
+  .opt{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem}
+  .opt label{display:flex;gap:6px;align-items:center;cursor:pointer}
+  .opt input{accent-color:var(--azul2)}
+  .esc{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .esc .b{border:1px solid var(--borde);border-radius:10px;padding:10px}
+  .esc .b h4{margin:0 0 6px;font-size:.82rem;color:var(--azul)}
+  /* trazado */
+  .tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .views{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .vw{text-align:center}
+  .vw h5{margin:0 0 4px;font-size:.78rem;color:var(--azul)}
+  .vw canvas{width:100%;aspect-ratio:460/560;border:2px solid var(--azul);border-radius:10px;background:#fff;touch-action:none;cursor:crosshair}
+  .vw .mini{display:flex;gap:6px;justify-content:center;margin-top:4px}
+  .vw .mini button{padding:3px 9px;font-size:.78rem}
+  .tchk{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:4px 16px;margin-top:12px}
+  .tchk .t{display:flex;gap:8px;align-items:center;font-size:.85rem;padding:5px 6px;border-bottom:1px dashed var(--borde)}
+  .tchk .t b{min-width:26px;color:var(--azul)}
+  .tchk .t span{flex:1}
+  .tchk .rd{display:flex;gap:10px;font-size:.78rem}
+  .tchk .rd label{display:flex;gap:3px;align-items:center;cursor:pointer}
+  .na{padding:14px;background:#f1f3f7;border-radius:8px;color:var(--gris);font-size:.9rem}
+  /* rúbrica */
+  .sec h3{margin:18px 0 6px;font-size:.95rem;background:var(--celeste);color:var(--azul);padding:7px 10px;border-radius:6px}
+  .cr{border:1px solid var(--borde);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  .cr.hid{display:none}
+  .cr.crit{border-left:4px solid var(--n1)}
+  .cr .top{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .cr .nom{flex:1;min-width:220px;font-size:.92rem;font-weight:600}
+  .cr .nom em{font-style:normal;font-weight:400;color:var(--gris);font-size:.74rem;display:block}
+  .tag{font-size:.68rem;padding:2px 7px;border-radius:10px;background:#e3e8ef;color:var(--azul);font-weight:700}
+  .tag.k{background:#fdeeee;color:var(--mal)}
+  .lv{display:flex;gap:6px}
+  .lv button{width:42px;height:38px;font-weight:700;font-size:1rem;border-width:2px}
+  .lv button[data-l="4"]{border-color:var(--n4);color:var(--n4)}
+  .lv button[data-l="3"]{border-color:var(--n3);color:var(--n3)}
+  .lv button[data-l="2"]{border-color:var(--n2);color:var(--n2)}
+  .lv button[data-l="1"]{border-color:var(--n1);color:var(--n1)}
+  .lv button.sel[data-l="4"]{background:var(--n4);color:#fff}
+  .lv button.sel[data-l="3"]{background:var(--n3);color:#fff}
+  .lv button.sel[data-l="2"]{background:var(--n2);color:#fff}
+  .lv button.sel[data-l="1"]{background:var(--n1);color:#fff}
+  .cur{font-size:.84rem;margin:8px 0 0;padding:8px 10px;background:#f8f9fc;border-radius:8px;min-height:20px}
+  .cur b{color:var(--azul)}
+  details.all{margin-top:6px;font-size:.78rem}
+  details.all summary{cursor:pointer;color:var(--azul2)}
+  .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin-top:6px}
+  .dgrid div{padding:8px;border-radius:8px;border:1px solid var(--borde)}
+  .dgrid div.on{outline:2px solid var(--azul2);background:var(--celeste)}
+  .dgrid div b{display:block;margin-bottom:2px}
+  .els{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px 14px;margin-top:8px}
+  .els label{display:flex;gap:8px;font-size:.84rem;align-items:flex-start;padding:3px 0;cursor:pointer}
+  .els input{width:18px;height:18px;accent-color:var(--ok);flex:none;margin-top:1px}
+  .sug{font-size:.78rem;color:var(--gris);margin-top:6px}
+  .sug a{color:var(--azul2);cursor:pointer;text-decoration:underline}
+  #estado{padding:12px;border-radius:8px;font-size:.9rem;display:none;white-space:pre-line}
+  #estado.ok{display:block;background:#eefaf3;color:var(--ok);border:1px solid #bfe5cd}
+  #estado.err{display:block;background:#fdeeee;color:var(--mal);border:1px solid #f1c3be}
+  #estado.info{display:block;background:var(--celeste);color:var(--azul);border:1px solid #c5d6ee}
+  input[type=color]{width:38px;height:34px;padding:2px;border:1px solid var(--borde);border-radius:8px;background:#fff}
+</style>
+</head>
+<body>
+<header>
+  <h1>Instrumento de Evaluación N° 1 · Rúbrica analítica (4 niveles)</h1>
+  <p>Registro manual (pat down), detector de metales manual y equipaje de mano · Apresto al Entrenamiento en Terreno (APR) 2026 · ETA-DGAC</p>
+</header>
+
+<main>
+  <div class="score" aria-live="polite">
+    <div><b id="sPuntos">0 / 0</b><small>Puntaje del grupo</small></div>
+    <div><b id="sPct">0%</b><small>Logro</small></div>
+    <div><b id="sNota">1,0</b><small>Nota (exigencia <span id="sExig"></span>%)</small></div>
+    <div><b id="sProg">0/0</b><small>Criterios puntuados</small></div>
+    <div class="bar"><i id="sBar"></i></div>
+  </div>
+  <div id="alertaCritica"></div>
+
+  <!-- I. DATOS -->
+  <section class="card">
+    <h2>I. Datos de la evaluación e integrantes del grupo</h2>
+    <div class="grid">
+      <label class="f">Carrera<input type="text" value="Técnico de Nivel Superior en Seguridad Aeroportuaria" readonly></label>
+      <label class="f">Módulo<input type="text" value="Apresto al Entrenamiento en Terreno (APR) – 2026, 2.º semestre" readonly></label>
+      <label class="f">Unidad<input type="text" id="unidad" value="A - B"></label>
+      <label class="f">Lugar / puesto<input type="text" id="lugar" value="PCS de entrenamiento (simulador)"></label>
+      <label class="f">Fecha y hora<input type="datetime-local" id="fechaHora"></label>
+      <label class="f">Sección / grupo N° *<input type="text" id="grupo" placeholder="Ej: Sección 1 · Grupo 3"></label>
+      <label class="f">Docente evaluador<input type="text" id="evaluador" value="Christian San Martín Oyarzún"></label>
+    </div>
+    <h4 style="margin:16px 0 6px;color:var(--azul);font-size:.9rem">Integrantes del grupo (3 a 4 estudiantes) *</h4>
+    <div id="integrantes"></div>
+    <button type="button" id="btnAddInt">+ Agregar integrante</button>
+  </section>
+
+  <!-- III. ESCENARIO -->
+  <section class="card">
+    <h2>III. Condiciones del escenario <span class="hint">(marcar antes de iniciar)</span></h2>
+    <div class="esc">
+      <div class="b"><h4>Mecanismo de definición</h4>
+        <div class="opt">
+          <label><input type="radio" name="mec" value="Definido por el docente" checked> Definido por el docente</label>
+          <label><input type="radio" name="mec" value="Sorteado (dado)"> Sorteado (dado)</label>
+          <label><input type="radio" name="mec" value="Sorteado (fichas)"> Sorteado (fichas)</label>
+          <label><input type="radio" name="mec" value="Otro"> Otro</label>
+        </div>
+        <input type="text" id="mecOtro" placeholder="Si es otro, especifica" style="margin-top:6px">
+      </div>
+      <div class="b"><h4>Motivo de la revisión del pasajero *</h4>
+        <div class="opt" style="flex-direction:column;gap:6px">
+          <label><input type="radio" name="motivo" value="ALEATORIO"> ALEATORIO e imprevisible (registro físico o manual; sin detector manual)</label>
+          <label><input type="radio" name="motivo" value="ALARMA de pórtico"> ALARMA de pórtico</label>
+          <label><input type="radio" name="motivo" value="ALARMA de rayos X / duda razonable"> ALARMA de rayos X / duda razonable (inspección secundaria)</label>
+        </div>
+      </div>
+      <div class="b"><h4>Estado de alerta *</h4>
+        <select id="alerta">
+          <option value="">Selecciona…</option>
+          <option>Azul</option><option>Verde</option><option>Amarillo</option><option>Naranja</option><option>Rojo</option>
+        </select>
+        <h4 style="margin-top:10px">Pasajero / equipaje del escenario</h4>
+        <div class="opt">
+          <label><input type="radio" name="pax" value="Pasajero simulado sin condición especial" checked> Sin condición especial</label>
+          <label><input type="radio" name="pax" value="Con condición especial (sala separada)"> Con condición especial (sala separada)</label>
+        </div>
+        <input type="text" id="paxEsp" placeholder="Condición especial (si aplica)" style="margin-top:6px">
+      </div>
+      <div class="b"><h4>Elemento(s) dispuesto(s) por el docente</h4>
+        <label class="f">Persona<input type="text" id="elPersona"></label>
+        <label class="f" style="margin-top:6px">Equipaje de mano<input type="text" id="elEquipaje"></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- V. HOJA DE TRAZADO -->
+  <section class="card">
+    <h2>V. Hoja de trazado <span class="hint">(recorrido real del detector · inicio con “X”, término con flecha · I = costado izquierdo del pasajero, D = derecho)</span></h2>
+    <div class="row" style="margin-bottom:10px">
+      <button type="button" id="tLapiz" class="act">✏️ Lápiz</button>
+      <button type="button" id="tX">✖ Inicio (X)</button>
+      <button type="button" id="tFlecha">➤ Término (flecha)</button>
+      <input type="color" id="color" value="#d62828" title="Color">
+      <select id="grosor" style="width:auto" title="Grosor"><option value="3">Fino</option><option value="5" selected>Medio</option><option value="8">Grueso</option></select>
+      <span class="hint">La flecha se orienta según el final del último trazo de esa vista.</span>
+    </div>
+    <div class="tabs">
+      <button type="button" id="tabPat" class="act">Pat down</button>
+      <button type="button" id="tabDet">Detector de metal manual</button>
+    </div>
+    <div id="hojaPat"></div>
+    <div id="hojaDet" style="display:none"></div>
+  </section>
+
+  <!-- VI. RÚBRICA -->
+  <section class="card">
+    <h2>VI. Rúbrica de evaluación <span class="hint">(puntaje del grupo: 4 · 3 · 2 · 1)</span></h2>
+    <p class="hint" style="margin-top:-6px">Un error crítico de cualquier integrante cuenta como error crítico del grupo. Los criterios marcados ★ son críticos (consentimiento y dignidad; IED). En criterios con elementos observables o trazo (T1–T9), el nivel se sugiere automáticamente y puedes corregirlo.</p>
+    <div id="rubrica"></div>
+  </section>
+
+  <!-- VII. RETROALIMENTACIÓN -->
+  <section class="card">
+    <h2>VII. Retroalimentación del evaluador</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+      <label class="f">Fortalezas observadas<textarea id="fort"></textarea></label>
+      <label class="f">Aspectos para mejorar / retroalimentación<textarea id="mejora"></textarea></label>
+      <label class="f">Compromisos de mejora<textarea id="comp"></textarea></label>
+    </div>
+    <p class="hint">Estas observaciones se entregan a la IA como insumo y se incluyen en el correo.</p>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <button type="button" id="btnEnviar" class="primary">📨 Enviar evaluación al grupo</button>
+      <span class="hint">Se envía a todos los integrantes, con copia al docente evaluador.</span>
+    </div>
+    <div id="estado" style="margin-top:12px"></div>
+  </section>
+</main>
+
+<script>
+/* ===================== CONFIGURACIÓN ===================== */
+const CONFIG = {
+  WEBHOOK_URL: "https://hook.us2.make.com/PEGA_AQUI_TU_WEBHOOK",
+  TOKEN: "CAMBIA_ESTE_TOKEN",
+  EXIGENCIA: 60,
+  ASIGNATURA: "Apresto al Entrenamiento en Terreno (APR) 2026 · Evaluación N° 1",
+  A3_SOLO_ALEATORIO: true   // Instrucción 2 del instrumento: "en ALARMA no se puntúa [E3]"; se asumió que corresponde al criterio A3 (estado de alerta/selección). Cambiar a false si no aplica.
+};
+
+/* ===================== DATOS DE LA RÚBRICA ===================== */
+const NIVELES = {4:"Logrado destacado",3:"Logrado",2:"Parcialmente logrado",1:"No logrado"};
+const TS = [
+  "Inicia en el costado izquierdo del pasajero (derecho del funcionario)",
+  "Parte por la cabeza y bordea todo el contorno sin saltos",
+  "Termina en la cabeza, en el lado contrario al de inicio",
+  "Frontal: zigzag continuo en el tren superior hasta la cadera",
+  "Frontal: brazos de forma lineal (no repite el contorno)",
+  "Frontal: piernas de forma lineal, de la cadera al calzado",
+  "Posterior: zigzag continuo en el tren superior hasta la zona sacra",
+  "Posterior: brazos de forma lineal",
+  "Posterior: piernas de forma lineal, de la zona glútea al calzado"
+];
+const SECS = {
+  A: "A. ASPECTOS TRANSVERSALES DE LA REVISIÓN DE PERSONAS (aplican a todo el procedimiento)",
+  B: "B. REGISTRO MANUAL DE LA PERSONA (PAT DOWN) – PRO-17 00, 8.9.8 y 8.9.9",
+  C: "C. INSPECCIÓN CON DETECTOR DE METALES TIPO MANUAL – Apéndice E y 8.6.4 (solo escenarios con ALARMA)",
+  D: "D. REVISIÓN DEL EQUIPAJE DE MANO – PRO-17 00, 8.17",
+  E: "E. COMUNICACIÓN, ACTITUD Y REGISTROS"
+};
+/* t: dominio C/H/A · k: crítico · th: umbrales [mín. nivel4, mín. nivel3, mín. nivel2] para elementos · tIdx: índices de T (0-based) del trazo del detector */
+const CRIT = [
+ {id:"A1",sec:"A",t:"A",k:true,ref:"PRO-17 00",nom:"Consentimiento, información y respeto a la dignidad del pasajero",d:[
+  "Explica el procedimiento antes de iniciar, obtiene el consentimiento expreso y avisa de forma verbal antes de revisar cada zona íntima o sensible (sin omitir ninguna). Mantiene trato cortés, firme y discreto, respeta el pudor del pasajero y agradece al finalizar. Ante duda o negativa ofrece la sala de revisión separada.",
+  "Explica el procedimiento y obtiene el consentimiento; avisa en la mayoría de las zonas sensibles (omite un aviso puntual). Trato cortés y respetuoso. Ofrece sala separada cuando corresponde, aunque con vacilación.",
+  "Obtiene un consentimiento solo tácito (no lo solicita) o avisa de las zonas sensibles de manera esporádica. Trato correcto pero mecánico, sin explicar el motivo. No ofrece sala separada ante la duda del pasajero.",
+  "Inicia la revisión sin informar ni pedir consentimiento, toca zonas sensibles sin aviso o trata al pasajero de forma brusca o irrespetuosa. Ante una negativa no aplica el procedimiento (sala separada y reporte al superior directo)."]},
+ {id:"A2",sec:"A",t:"C",ref:"PRO-17 00",nom:"Selección del método según el motivo de la revisión (alarma o aleatorio)",d:[
+  "Identifica el motivo declarado en el escenario y fundamenta oralmente con la norma el método: en ALARMA (pórtico, rayos X o duda razonable) aplica registro físico completo y detector manual; en ALEATORIO aplica solo registro físico o manual, sin detector manual. Lo aplica sin corrección del evaluador.",
+  "Identifica el motivo y aplica el método correcto, pero el fundamento normativo es parcial (menciona la regla sin el numeral o sin explicar el porqué).",
+  "Aplica el método correcto solo con ayuda o corrección del evaluador, o confunde el motivo y rectifica durante la actividad.",
+  "Aplica un método incorrecto (p. ej., usa detector manual en un registro aleatorio o prescinde del registro físico ante una alarma) y no lo reconoce ni corrige."]},
+ {id:"A3",sec:"A",t:"C",ref:"PRO-17 00",nom:"Aplicación de las medidas según el estado de alerta",soloAleatorio:true,d:[
+  "Declara el estado de alerta del escenario (azul, verde, amarillo, naranja o rojo) y su proporción de selección (personas 1, 3, 5, 7 o 9 de cada 10; equipaje 1, 2, 4, 5 o 10 de cada 20).",
+  "Declara el estado de alerta; la proporción de selección o el criterio de imprevisibilidad se explican de forma incompleta.",
+  "Reconoce el estado de alerta, pero no ajusta el procedimiento, o justifica la selección solo como \"al azar\" sin criterio de observación.",
+  "Ignora el estado de alerta, o selecciona al pasajero por criterios discriminatorios o de conveniencia, sin duda razonable ni técnica de observación."]},
+ {id:"A4",sec:"A",t:"H",ref:"PRO-17 00",nom:"Preparación del pasajero, del puesto de revisión y protección personal",d:[
+  "Instruye con claridad: retirar objetos metálicos o que interfieran y colocarlos en bandeja hacia el rayo X; desprenderse de elementos de ocultamiento (abrigos, sombrero o tocado, corbata, cinturón, calzado voluminoso). Se coloca guantes antes de iniciar, ubica al pasajero de frente al funcionario y despeja el espacio de trabajo.",
+  "Cumple todas las acciones, pero una queda incompleta o tardía (p. ej., se coloca los guantes una vez iniciada la revisión).",
+  "Omite dos de las acciones de preparación o da instrucciones confusas que obligan a repetirlas.",
+  "Omite tres o más acciones de preparación, o inicia la revisión sin protección personal ni control del espacio de trabajo."]},
+ {id:"B1",sec:"B",t:"H",ref:"PRO-17",nom:"Secuencia sistemática del registro: por delante y por detrás, siguiendo el contorno",d:[
+  "Revisa por delante y por detrás siguiendo el contorno del cuerpo y una secuencia constante (cabeza o tocado → prendas exteriores → tronco → cintura → piernas → calzado), y sin dejar regiones sin cubrir.",
+  "Revisa delante y detrás con secuencia constante, pero olvida una región menor que corrige antes de terminar.",
+  "Revisa delante y detrás de manera intermitente; la secuencia cambia durante el procedimiento y deja una región sin revisar.",
+  "No revisa la parte posterior, deja dos o más regiones sin revisar o no sigue ninguna secuencia."]},
+ {id:"B2",sec:"B",t:"H",ref:"PRO-17 00",nom:"Revisión de cabeza y prendas exteriores (en la misma secuencia)",th:[8,6,4],els:[
+  "E1 Sombrero o tocado (con respeto)","E2 Cabello (inspección física o visual, si procede)","E3 Espalda","E4 Cuello","E5 Solapas","E6 Hombros","E7 Bolsillos externos e internos","E8 Brazos"],d:[
+  "Cumple los 8 elementos observables (E1 a E8), sin ayuda del evaluador y en el orden indicado.",
+  "Cumple 6 a 7 de 8 elementos, sin ayuda. Las omisiones son menores y no comprometen la detección.",
+  "Cumple 4 a 5 de 8 elementos, o requiere recordatorios del evaluador para completar la secuencia.",
+  "Cumple 0 a 3 de 8 elementos, o comete un error crítico (omite bolsillos o la espalda de las prendas exteriores)."]},
+ {id:"B6",sec:"B",t:"H",ref:"PRO-17 00",nom:"Manejo de los hallazgos durante el registro",d:[
+  "Ante un objeto hallado detiene el registro en esa zona, solicita al pasajero retirarlo (o lo retira en su presencia), lo identifica, impide que ingrese a la zona de seguridad restringida mientras no se defina su tratamiento, informa al encargado si hay riesgo y retoma la secuencia sin perder el orden.",
+  "Aplica las acciones anteriores con una omisión menor (p. ej., no verbaliza el motivo o retoma la secuencia con desorden).",
+  "Identifica el objeto, pero lo deja al alcance del pasajero o no informa a quien corresponde.",
+  "Pasa por alto el objeto, lo devuelve sin identificarlo o permite su ingreso a la zona de seguridad restringida."]},
+ {id:"C1",sec:"C",t:"C",ref:"PRO-17 00",nom:"Fundamento y condiciones de uso del detector de metales manual",d:[
+  "Explica que el detector manual resuelve alarmas del pórtico o de rayos X y se complementa con el registro físico; indica que no se usa en el registro aleatorio; verifica el estado operativo del equipo antes de usarlo y ubica al pasajero de pie, de frente y con los brazos separados del cuerpo.",
+  "Explica el uso y sus límites, pero omite verificar el estado del equipo o la posición del pasajero.",
+  "Explica el uso solo parcialmente (no menciona su complemento con el registro físico o la restricción en aleatorio).",
+  "Desconoce cuándo corresponde usarlo, o lo emplea sin verificar el equipo ni la posición del pasajero."]},
+ {id:"C2",sec:"C",t:"H",ref:"PRO-17 00",nom:"Técnica de manejo del detector manual",d:[
+  "Mantiene distancia corta y constante al cuerpo sin presionarlo ni golpearlo, realiza un barrido continuo y pausado, se detiene sobre cada señal para precisarla y mantiene el equipo estable durante toda la inspección.",
+  "Mantiene distancia y ritmo adecuados con una o dos irregularidades (acelera o se aleja momentáneamente).",
+  "Distancia o velocidad irregular en varios tramos; contacta ocasionalmente el cuerpo; no precisa algunas señales.",
+  "Barrido veloz o brusco, golpea o presiona al pasajero con el equipo, o no se detiene ante las señales."]},
+ {id:"C3",sec:"C",t:"H",ref:"PRO-17 00 · Trazo 1: CONTORNO (T1 a T3)",nom:"Trazo del detector 1: contorno del cuerpo",tIdx:[0,1,2],d:[
+  "Cumple T1, T2 y T3 (3 de 3): inicia en el costado izquierdo del pasajero (derecho del funcionario) y por la cabeza; bordea todo el contorno sin saltos (hombros, brazos, tronco y piernas por el exterior, retorno por el lado opuesto); termina en la cabeza, en el lado contrario.",
+  "Cumple 2 de 3 con trazo continuo; el incumplimiento es menor (p. ej., un tramo corto del contorno sin cubrir o termina cerca de la cabeza, pero no en ella).",
+  "Cumple 1 de 3, o abandona el contorno y lo retoma con ayuda del evaluador.",
+  "Cumple 0 de 3: inicia por el costado derecho del pasajero, no parte por la cabeza o no realiza el contorno."]},
+ {id:"C4",sec:"C",t:"H",ref:"PRO-17 00 · Trazo 2: FRONTAL (T4 a T6)",nom:"Trazo del detector 2: cara frontal",tIdx:[3,4,5],d:[
+  "Cumple T4, T5 y T6 (3 de 3): zigzag continuo en el tren superior hasta la cadera; brazos de forma lineal (sin repetir el contorno); piernas de forma lineal, de la cadera al calzado.",
+  "Cumple 2 de 3; el zigzag es continuo, pero llega a la cadera con un tramo sin cubrir, o un brazo o pierna se recorre de forma incompleta.",
+  "Cumple 1 de 3, o reemplaza el zigzag por pasadas desordenadas que requieren corrección del evaluador.",
+  "Cumple 0 de 3: no realiza zigzag, repite el contorno en lugar de recorrer brazos y piernas, o no revisa la cara frontal."]},
+ {id:"C5",sec:"C",t:"H",ref:"PRO-17 00 · Trazo 3: POSTERIOR (T7 a T9)",nom:"Trazo del detector 3: cara posterior",tIdx:[6,7,8],d:[
+  "Cumple T7, T8 y T9 (3 de 3): zigzag continuo en el tren superior hasta la zona sacra; brazos de forma lineal; piernas de forma lineal, de la zona glútea al calzado.",
+  "Cumple 2 de 3; el zigzag es continuo, pero no alcanza la zona sacra por completo, o un brazo o pierna se recorre de forma incompleta.",
+  "Cumple 1 de 3, o realiza la cara posterior con interrupciones y ayuda del evaluador.",
+  "Cumple 0 de 3: no revisa la cara posterior con el detector o lo hace sin ningún patrón."]},
+ {id:"C6",sec:"C",t:"H",ref:"PRO-17",nom:"Resolución de la alarma: inspección secundaria completa",d:[
+  "Ante cada señal se detiene, localiza la zona, revisa físicamente la fuente, identifica el objeto, lo retira y repite el pasaje del detector hasta que la alarma se resuelve por completo; solo entonces autoriza el paso y verbaliza el resultado. Completa además el registro físico de la persona.",
+  "Resuelve todas las alarmas, pero omite repetir el pasaje del detector en una ocasión o no verbaliza el resultado.",
+  "Resuelve las alarmas parcialmente (identifica la fuente solo en parte de los casos) o da por resuelta una alarma sin confirmarla.",
+  "Autoriza el paso con la alarma sin resolver, o no identifica el objeto que la originó."]},
+ {id:"D1",sec:"D",t:"H",ref:"PRO-17",nom:"Preparación del registro manual del equipaje de mano",th:[6,5,3],els:[
+  "E1 Se coloca guantes (quirúrgicos o similares)","E2 Verifica que el equipaje corresponde al pasajero","E3 Ubica el bulto en la mesa de registro sin interferir con el espacio de apertura","E4 Mantiene el registro en presencia del propietario durante todo el procedimiento","E5 Solicita que el pasajero abra el bulto (de preferencia)","E6 Separa computadores y otros equipos electrónicos de sus bolsos"],d:[
+  "Cumple los 6 elementos observables (E1 a E6), sin ayuda del evaluador y en el orden indicado.",
+  "Cumple 5 de 6 elementos, sin ayuda. Las omisiones son menores y no comprometen la detección.",
+  "Cumple 3 a 4 de 6 elementos, o requiere recordatorios del evaluador para completar la secuencia.",
+  "Cumple 0 a 2 de 6 elementos, o comete un error crítico (registra el equipaje sin el propietario presente)."]},
+ {id:"D2",sec:"D",t:"H",ref:"PRO-17",nom:"Inspección de la estructura del equipaje y búsqueda de ocultamientos",th:[9,7,5],els:[
+  "E1 Fondo falso: compara medidas externa e interior con regla o vara de borde recto","E2 Forro","E3 Borde","E4 Costuras","E5 Apliques y botoneras","E6 Cierres y cerraduras","E7 Bisagras","E8 Ruedas y mangos","E9 Peso no uniforme o distinto al del equipaje vacío (decide usar rayos X si es necesario)"],d:[
+  "Cumple los 9 elementos observables (E1 a E9), sin ayuda del evaluador y en el orden indicado.",
+  "Cumple 7 a 8 de 9 elementos, sin ayuda. Las omisiones son menores y no comprometen la detección.",
+  "Cumple 5 a 6 de 9 elementos, o requiere recordatorios del evaluador para completar la secuencia.",
+  "Cumple 0 a 4 de 9 elementos, o comete un error crítico (no verifica fondo falso ni signos de manipulación)."]},
+ {id:"D3",sec:"D",t:"H",ref:"PRO-17",nom:"Inspección del contenido: capa por capa y artículos de atención",th:[5,4,3],els:[
+  "E1 Revisa el contenido capa por capa hasta que no queda nada","E2 Inspecciona recipientes, botellas, líquidos, aerosoles, geles y cremas y verifica que cumplan las disposiciones de transporte de mercancías peligrosas","E3 Verifica equipos eléctricos o electrónicos, su funcionamiento y que sus baterías cumplan las disposiciones","E4 Examina objetos huecos u opacos (termos, libros, muletas) y los reinserta en rayos X si es necesario","E5 Presta atención a contenidos que puedan ser líquidos volátiles o inflamables"],d:[
+  "Cumple los 5 elementos observables (E1 a E5), sin ayuda del evaluador y en el orden indicado.",
+  "Cumple 4 de 5 elementos, sin ayuda. Las omisiones son menores y no comprometen la detección.",
+  "Cumple 3 de 5 elementos, o requiere recordatorios del evaluador para completar la secuencia.",
+  "Cumple 0 a 2 de 5 elementos, o comete un error crítico (da por revisado el bulto sin vaciarlo)."]},
+ {id:"D4",sec:"D",t:"C",ref:"PRO 17 00",nom:"Identificación y clasificación del artículo hallado",d:[
+  "Identifica el artículo y lo clasifica correctamente como inofensivo, prohibido, retenido, mercancía peligrosa o sospechoso con el listado vigente del DASA y las Instrucciones Técnicas; fundamenta oralmente y deriva al procedimiento que corresponde.",
+  "Clasifica correctamente, pero el fundamento es parcial o no cita la fuente (listado DASA o Instrucciones Técnicas).",
+  "Clasifica solo con ayuda del evaluador, o confunde objeto prohibido con objeto retenido.",
+  "Clasifica incorrectamente, o permite el paso del artículo sin evaluarlo."]},
+ {id:"D6",sec:"D",t:"C",k:true,ref:"PRO-17",nom:"Respuesta ante sospecha de artefacto explosivo improvisado (IED)",d:[
+  "Detiene de inmediato la inspección, no manipula ni mueve el objeto, mantiene la calma, aleja al pasajero y a terceros según el protocolo local, informa de inmediato al encargado del puesto, quien notifica al Jefe de Seguridad, y aplica el plan de contingencia. (Si el escenario no incluye el hallazgo, se evalúa con una pregunta de verbalización del docente.)",
+  "Realiza los pasos esenciales, pero omite uno secundario (p. ej., el orden de la cadena de notificación).",
+  "Informa, pero demora la notificación o manipula el objeto antes de informar.",
+  "Manipula o abre el objeto, o no informa al encargado."]},
+ {id:"E1",sec:"E",t:"A",ref:"Material de clase, Unidad A (posiciones de trabajo en un PCS)",nom:"Comunicación con el pasajero y coordinación con el equipo del PCS",d:[
+  "Se comunica con claridad y cortesía con el pasajero (instrucciones breves y precisas) y con su equipo (aviso de alarmas, relevo de posiciones); respeta su rol y colabora sin que el evaluador deba intervenir.",
+  "Mensajes claros, pero una coordinación con el equipo es tardía o implícita.",
+  "Instrucciones ambiguas o repetidas; coordina con el equipo solo cuando se le solicita.",
+  "No se coordina con el equipo, da instrucciones contradictorias o se comunica de forma descortés."]}
+];
+
+/* ===================== UTILIDADES ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "");
+const getRadio = n => (document.querySelector(`input[name="${n}"]:checked`) || {}).value || "";
+
+/* ===================== INTEGRANTES ===================== */
+const integEl = $("integrantes");
+function addInt(){
+  if (integEl.children.length >= 4) return;
+  const row = document.createElement("div"); row.className = "integ";
+  row.innerHTML = `<span class="n"></span>
+    <input type="text" class="c1 nom" placeholder="Nombres y apellidos">
+    <input type="email" class="c2 mail" placeholder="correo@estudiante.cl">
+    <input type="text" class="c3 rol" placeholder="Rol(es) en el escenario">
+    <button type="button" title="Quitar">✕</button>`;
+  row.querySelector("button").onclick = () => { if (integEl.children.length > 3) { row.remove(); renum(); } };
+  integEl.appendChild(row); renum();
+}
+function renum(){ [...integEl.children].forEach((r, i) => r.querySelector(".n").textContent = i + 1); $("btnAddInt").style.display = integEl.children.length >= 4 ? "none" : ""; }
+$("btnAddInt").onclick = addInt; addInt(); addInt(); addInt();
+(function(){ const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $("fechaHora").value = d.toISOString().slice(0, 16); })();
+
+/* ===================== ESTADO DE LA RÚBRICA ===================== */
+const ST = {};  // id -> {lvl, manual, touched, els:[bool]}
+CRIT.forEach(c => ST[c.id] = { lvl: null, manual: false, touched: false, els: (c.els || []).map(() => false) });
+const T_DET = Array(9).fill(null);   // true / false / null (detector)
+const T_PAT = Array(9).fill(null);   // pat down (solo registro)
+
+const motivo = () => getRadio("motivo");
+const esAleatorio = () => motivo() === "ALEATORIO";
+const esAlarma = () => motivo().startsWith("ALARMA");
+function aplica(c){
+  if (c.sec === "C" && esAleatorio()) return false;
+  if (c.soloAleatorio && CONFIG.A3_SOLO_ALEATORIO && esAlarma()) return false;
+  return true;
+}
+function nivelPorConteo(n, th){ return n >= th[0] ? 4 : n >= th[1] ? 3 : n >= th[2] ? 2 : 1; }
+function sugerido(c){
+  const s = ST[c.id];
+  if (c.els){ if (!s.touched) return null; return nivelPorConteo(s.els.filter(Boolean).length, c.th); }
+  if (c.tIdx){
+    const arr = c.tIdx.map(i => T_DET[i]);
+    if (arr.every(v => v === null)) return null;
+    return nivelPorConteo(arr.filter(v => v === true).length, [3, 2, 1]);
+  }
+  return null;
+}
+function autoNivel(c){ const s = ST[c.id]; if (s.manual) return; const g = sugerido(c); if (g !== null) s.lvl = g; }
+
+/* ===================== RENDER RÚBRICA ===================== */
+const rubEl = $("rubrica");
+const secBox = {};
+Object.keys(SECS).forEach(k => {
+  const d = document.createElement("div"); d.className = "sec"; d.id = "sec" + k;
+  d.innerHTML = `<h3>${esc(SECS[k])}</h3>`; rubEl.appendChild(d); secBox[k] = d;
+});
+const crEl = {};
+CRIT.forEach(c => {
+  const el = document.createElement("div"); el.className = "cr" + (c.k ? " crit" : ""); crEl[c.id] = el;
+  const dom = {C:"Conocimientos", H:"Habilidades", A:"Actitudes"}[c.t];
+  let extra = "";
+  if (c.els) extra = `<div class="els">${c.els.map((t, i) => `<label><input type="checkbox" data-i="${i}"><span>${esc(t)}</span></label>`).join("")}</div>`;
+  if (c.tIdx) extra = `<div class="sug" data-tsum></div>`;
+  el.innerHTML = `
+    <div class="top">
+      <div class="nom">${c.id} · ${esc(c.nom)}${c.k ? " ★" : ""}<em>${esc(c.ref)}</em></div>
+      <span class="tag">${dom}</span>${c.k ? '<span class="tag k">CRÍTICO</span>' : ""}
+      <div class="lv">${[4,3,2,1].map(n => `<button type="button" data-l="${n}" title="${NIVELES[n]}">${n}</button>`).join("")}</div>
+    </div>
+    ${extra}
+    <div class="sug" data-sug></div>
+    <div class="cur" data-cur>Selecciona un nivel.</div>
+    <details class="all"><summary>Ver descriptores de los 4 niveles</summary>
+      <div class="dgrid">${[4,3,2,1].map((n, i) => `<div data-n="${n}"><b>Nivel ${n} · ${NIVELES[n]}</b>${esc(c.d[i])}</div>`).join("")}</div>
+    </details>`;
+  el.querySelectorAll(".lv button").forEach(b => b.onclick = () => { ST[c.id].lvl = +b.dataset.l; ST[c.id].manual = !!(c.els || c.tIdx); refrescar(); });
+  el.querySelectorAll(".els input").forEach(cb => cb.onchange = () => { ST[c.id].els[+cb.dataset.i] = cb.checked; ST[c.id].touched = true; autoNivel(c); refrescar(); });
+  secBox[c.sec].appendChild(el);
+});
+function pintarCriterio(c){
+  const el = crEl[c.id], s = ST[c.id], ap = aplica(c);
+  el.classList.toggle("hid", !ap);
+  el.querySelectorAll(".lv button").forEach(b => b.classList.toggle("sel", s.lvl === +b.dataset.l));
+  const cur = el.querySelector("[data-cur]");
+  cur.innerHTML = s.lvl ? `<b>Nivel ${s.lvl} · ${NIVELES[s.lvl]}:</b> ${esc(c.d[4 - s.lvl])}` : "Selecciona un nivel.";
+  el.querySelectorAll(".dgrid div").forEach(d => d.classList.toggle("on", +d.dataset.n === s.lvl));
+  const sug = el.querySelector("[data-sug]"), g = sugerido(c);
+  if (g !== null){
+    sug.innerHTML = `Nivel sugerido por el conteo: <b>${g}</b>` + (s.manual && s.lvl !== g ? ` · <a data-re>usar sugerido</a>` : "");
+    const a = sug.querySelector("[data-re]"); if (a) a.onclick = () => { s.manual = false; s.lvl = g; refrescar(); };
+  } else sug.textContent = "";
+  if (c.els){ const n = s.els.filter(Boolean).length; el.querySelector(".els").dataset.n = n; }
+  if (c.tIdx){
+    const n = c.tIdx.filter(i => T_DET[i] === true).length;
+    el.querySelector("[data-tsum]").innerHTML = `Verificación en la Hoja de trazado del detector: <b>${n} de 3</b> cumplidos (${c.tIdx.map(i => "T" + (i + 1)).join(", ")}).`;
+  }
+}
+function aplicables(){ return CRIT.filter(aplica); }
+function calcular(){
+  const ap = aplicables(), pts = ap.reduce((s, c) => s + (ST[c.id].lvl || 0), 0);
+  const done = ap.filter(c => ST[c.id].lvl).length, max = ap.length * 4;
+  const pct = max ? pts / max * 100 : 0;
+  $("sPuntos").textContent = `${pts} / ${max}`;
+  $("sPct").textContent = `${pct.toFixed(0)}%`;
+  $("sNota").textContent = done === ap.length && ap.length ? notaChilena(pct).toFixed(1).replace(".", ",") : "—";
+  $("sProg").textContent = `${done}/${ap.length}`;
+  $("sBar").style.width = pct + "%";
+  const crit = ap.filter(c => c.k && ST[c.id].lvl === 1);
+  const al = $("alertaCritica");
+  if (crit.length){ al.style.display = "block"; al.textContent = `⚠ Criterio crítico en nivel 1 (${crit.map(c => c.id).join(", ")}): aplicar la regla del resumen según el reglamento de evaluación de la Escuela.`; }
+  else al.style.display = "none";
+  return { pts, max, pct, done, n: ap.length, crit };
+}
+function notaChilena(pct){
+  const e = CONFIG.EXIGENCIA;
+  const n = pct >= e ? 4 + 3 * (pct - e) / (100 - e) : 1 + 3 * pct / e;
+  return Math.max(1, Math.min(7, n));
+}
+function refrescar(){
+  CRIT.forEach(c => { if (c.tIdx || c.els) autoNivel(c); });
+  CRIT.forEach(pintarCriterio);
+  Object.keys(SECS).forEach(k => { secBox[k].style.display = CRIT.some(c => c.sec === k && aplica(c)) ? "" : "none"; });
+  const noteC = $("noteC");
+  if (esAleatorio()){
+    if (!noteC){ const n = document.createElement("div"); n.id = "noteC"; n.className = "na"; n.textContent = "Escenario ALEATORIO: la sección C (detector manual) no se puntúa."; rubEl.insertBefore(n, secBox.D); }
+  } else if (noteC) noteC.remove();
+  $("tabDet").style.opacity = esAleatorio() ? .5 : 1;
+  const na = $("naDet"); if (na) na.style.display = esAleatorio() ? "" : "none";
+  calcular();
+}
+$("sExig").textContent = CONFIG.EXIGENCIA;
+document.querySelectorAll('input[name="motivo"]').forEach(r => r.onchange = refrescar);
+
+/* ===================== HOJA DE TRAZADO ===================== */
+let tool = "lapiz";
+function setTool(t){
+  tool = t;
+  $("tLapiz").classList.toggle("act", t === "lapiz");
+  $("tX").classList.toggle("act", t === "x");
+  $("tFlecha").classList.toggle("act", t === "flecha");
+}
+$("tLapiz").onclick = () => setTool("lapiz"); $("tX").onclick = () => setTool("x"); $("tFlecha").onclick = () => setTool("flecha");
+
+const CW = 460, CH = 560;
+function silueta(c, view){
+  c.save();
+  c.setTransform(0.8, 0, 0, 0.8, -10, 14);
+  c.fillStyle = "#eef1f6"; c.strokeStyle = "#8a96a8"; c.lineWidth = 3; c.lineJoin = "round"; c.lineCap = "round";
+  c.beginPath(); c.arc(300, 105, 52, 0, Math.PI * 2); c.fill(); c.stroke();
+  c.beginPath(); c.rect(278, 152, 44, 36); c.fill(); c.stroke();
+  c.beginPath();
+  c.moveTo(255, 188); c.lineTo(110, 215); c.lineTo(40, 262); c.lineTo(62, 292); c.lineTo(130, 262); c.lineTo(235, 258);
+  c.lineTo(232, 410); c.lineTo(222, 640); c.lineTo(222, 668); c.lineTo(285, 668); c.lineTo(296, 440); c.lineTo(304, 440);
+  c.lineTo(315, 668); c.lineTo(378, 668); c.lineTo(378, 640); c.lineTo(368, 410); c.lineTo(365, 258); c.lineTo(470, 262);
+  c.lineTo(538, 292); c.lineTo(560, 262); c.lineTo(490, 215); c.lineTo(345, 188);
+  c.closePath(); c.fill(); c.stroke();
+  c.fillStyle = "#8a96a8"; c.textAlign = "center";
+  if (view === "frontal"){ c.setLineDash([6, 6]); c.lineWidth = 1.5; c.beginPath(); c.moveTo(300, 190); c.lineTo(300, 440); c.stroke(); c.setLineDash([]); }
+  if (view === "posterior"){ c.setLineDash([6, 6]); c.lineWidth = 1.5; c.beginPath(); c.moveTo(236, 395); c.lineTo(364, 395); c.stroke(); c.setLineDash([]);
+    c.font = "12px system-ui,Arial"; c.fillText("zona sacra", 300, 388); }
+  c.font = "bold 40px system-ui,Arial";
+  // Frontal/contorno: el costado izquierdo del pasajero queda a la derecha del dibujo. Posterior: a la izquierda.
+  const izqX = view === "posterior" ? 70 : 530, derX = view === "posterior" ? 530 : 70;
+  c.fillText("I", izqX, 360); c.fillText("D", derX, 360);
+  c.font = "bold 18px system-ui,Arial";
+  c.fillText(view === "posterior" ? "VISTA POSTERIOR" : view === "frontal" ? "VISTA FRONTAL" : "CONTORNO", 300, 30);
+  c.restore();
+}
+function dibujarItems(c, items){
+  items.forEach(it => {
+    c.save(); c.strokeStyle = it.color; c.fillStyle = it.color;
+    if (it.type === "stroke"){
+      c.lineWidth = it.size; c.lineCap = "round"; c.lineJoin = "round"; c.beginPath();
+      it.pts.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y));
+      if (it.pts.length === 1) c.lineTo(it.pts[0].x + .1, it.pts[0].y + .1);
+      c.stroke();
+    } else if (it.type === "x"){
+      c.lineWidth = 5; c.lineCap = "round"; c.beginPath();
+      c.moveTo(it.x - 11, it.y - 11); c.lineTo(it.x + 11, it.y + 11); c.moveTo(it.x + 11, it.y - 11); c.lineTo(it.x - 11, it.y + 11); c.stroke();
+    } else if (it.type === "flecha"){
+      c.translate(it.x, it.y); c.rotate(it.ang);
+      c.beginPath(); c.moveTo(14, 0); c.lineTo(-10, -11); c.lineTo(-10, 11); c.closePath(); c.fill();
+    }
+    c.restore();
+  });
+}
+const VISTAS = [["contorno", "CONTORNO (vista frontal)"], ["frontal", "FRONTAL (zigzag, brazos y piernas)"], ["posterior", "POSTERIOR (vista de espaldas)"]];
+const HOJAS = {};
+function crearHoja(key, cont, tarr, titulo, nota){
+  const hoja = { key, vistas: [] };
+  const views = document.createElement("div"); views.className = "views";
+  VISTAS.forEach(([v, label]) => {
+    const w = document.createElement("div"); w.className = "vw";
+    w.innerHTML = `<h5>${label}</h5><canvas width="${CW}" height="${CH}"></canvas><div class="mini"><button type="button" data-u>↩ Deshacer</button><button type="button" data-c>🗑 Limpiar</button></div>`;
+    const cv = w.querySelector("canvas"), ctx = cv.getContext("2d");
+    const V = { view: v, cv, ctx, items: [] };
+    const render = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, CW, CH); silueta(ctx, v); dibujarItems(ctx, V.items); };
+    V.render = render; render();
+    let dib = false, actual = null;
+    const pos = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * CW / r.width, y: (e.clientY - r.top) * CH / r.height }; };
+    cv.addEventListener("pointerdown", e => {
+      e.preventDefault(); cv.setPointerCapture(e.pointerId);
+      const p = pos(e), color = $("color").value;
+      if (tool === "x"){ V.items.push({ type: "x", x: p.x, y: p.y, color }); render(); return; }
+      if (tool === "flecha"){
+        let ang = -Math.PI / 2;
+        const last = [...V.items].reverse().find(i => i.type === "stroke");
+        if (last){ const e2 = last.pts[last.pts.length - 1]; for (let k = last.pts.length - 2; k >= 0; k--){ const q = last.pts[k]; if (Math.hypot(e2.x - q.x, e2.y - q.y) >= 8){ ang = Math.atan2(e2.y - q.y, e2.x - q.x); break; } } }
+        V.items.push({ type: "flecha", x: p.x, y: p.y, ang, color }); render(); return;
+      }
+      dib = true; actual = { type: "stroke", color, size: +$("grosor").value, pts: [p] }; V.items.push(actual); render();
+    });
+    cv.addEventListener("pointermove", e => { if (!dib) return; actual.pts.push(pos(e)); render(); });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(ev => cv.addEventListener(ev, () => { dib = false; actual = null; }));
+    w.querySelector("[data-u]").onclick = () => { V.items.pop(); render(); };
+    w.querySelector("[data-c]").onclick = () => { if (!V.items.length || confirm("¿Borrar esta vista?")){ V.items.length = 0; render(); } };
+    views.appendChild(w); hoja.vistas.push(V);
+  });
+  cont.appendChild(views);
+  const tc = document.createElement("div"); tc.className = "tchk";
+  tc.innerHTML = `<div style="grid-column:1/-1" class="hint"><b>${titulo}</b> ${nota}</div>` + TS.map((t, i) => `
+    <div class="t"><b>T${i + 1}</b><span>${esc(t)}</span>
+      <div class="rd"><label><input type="radio" name="${key}T${i}" value="1"> Cumple</label><label><input type="radio" name="${key}T${i}" value="0"> No cumple</label></div></div>`).join("");
+  tc.querySelectorAll("input").forEach(inp => inp.onchange = () => {
+    const i = +inp.name.slice(key.length + 1); tarr[i] = inp.value === "1"; refrescar();
+  });
+  cont.appendChild(tc);
+  HOJAS[key] = hoja;
+  return hoja;
+}
+crearHoja("pat", $("hojaPat"), T_PAT, "Verificación del trazo (Pat down).", "Registro de lo observado; no determina C3–C5.");
+const naDet = document.createElement("div"); naDet.id = "naDet"; naDet.className = "na"; naDet.style.display = "none"; naDet.style.marginBottom = "10px";
+naDet.textContent = "Escenario ALEATORIO: no se usa detector manual. Esta hoja no se puntúa.";
+$("hojaDet").appendChild(naDet);
+crearHoja("det", $("hojaDet"), T_DET, "Verificación del trazo (Detector manual).", "Determina los criterios C3, C4 y C5.");
+$("tabPat").onclick = () => { $("hojaPat").style.display = ""; $("hojaDet").style.display = "none"; $("tabPat").classList.add("act"); $("tabDet").classList.remove("act"); };
+$("tabDet").onclick = () => { $("hojaPat").style.display = "none"; $("hojaDet").style.display = ""; $("tabDet").classList.add("act"); $("tabPat").classList.remove("act"); };
+
+function exportarHoja(hoja, titulo, sub, noAplica){
+  const H = 78, off = document.createElement("canvas");
+  off.width = CW * 3; off.height = CH + H + 26;
+  const c = off.getContext("2d");
+  c.fillStyle = "#fff"; c.fillRect(0, 0, off.width, off.height);
+  c.fillStyle = "#0b3a6e"; c.fillRect(0, 0, off.width, H);
+  c.fillStyle = "#fff"; c.textAlign = "left"; c.textBaseline = "middle";
+  c.font = "bold 26px system-ui,Arial"; c.fillText(titulo, 20, 28);
+  c.font = "18px system-ui,Arial"; c.fillText(sub, 20, 58);
+  hoja.vistas.forEach((V, i) => {
+    c.save(); c.translate(i * CW, H + 26);
+    c.fillStyle = "#0b3a6e"; c.textAlign = "center"; c.font = "bold 15px system-ui,Arial"; c.textBaseline = "alphabetic";
+    c.fillText(VISTAS[i][1], CW / 2, -8);
+    silueta(c, V.view); if (!noAplica) dibujarItems(c, V.items);
+    c.strokeStyle = "#d5dce6"; c.lineWidth = 2; c.strokeRect(0, 0, CW, CH);
+    c.restore();
+  });
+  if (noAplica){ c.fillStyle = "rgba(255,255,255,.75)"; c.fillRect(0, H + 26, off.width, CH); c.fillStyle = "#5b6675"; c.font = "bold 40px system-ui,Arial"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("NO APLICA (registro aleatorio)", off.width / 2, H + 26 + CH / 2); }
+  return off.toDataURL("image/png").split(",")[1];
+}
+
+/* ===================== ENVÍO ===================== */
+const estado = $("estado");
+const msg = (t, x) => { estado.className = t; estado.textContent = x; };
+const marca = v => v === true ? "cumple" : v === false ? "no cumple" : "sin marcar";
+const tTexto = arr => TS.map((t, i) => `T${i + 1} ${t}: ${marca(arr[i])}`).join("\n");
+
+function tablaHtml(ap){
+  const colores = {4:"#1b8a4b", 3:"#6aa84f", 2:"#e69f00", 1:"#c0392b"};
+  let h = `<table cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:13px;font-family:Arial,Helvetica,sans-serif"><tr style="background:#0b3a6e;color:#fff"><th align="left">Criterio</th><th>Nivel</th><th align="left">Categoría</th></tr>`;
+  let sec = "";
+  ap.forEach(c => {
+    if (c.sec !== sec){ sec = c.sec; h += `<tr><td colspan="3" style="background:#e8f0fb;color:#0b3a6e;font-weight:bold">${esc(SECS[sec])}</td></tr>`; }
+    const l = ST[c.id].lvl;
+    h += `<tr style="border-bottom:1px solid #d5dce6"><td>${c.id} · ${esc(c.nom)}${c.k ? " ★" : ""}</td><td align="center" style="background:${colores[l]};color:#fff;font-weight:bold">${l}</td><td>${NIVELES[l]}</td></tr>`;
+  });
+  return h + "</table>";
+}
+function detalle(c){
+  const s = ST[c.id], l = s.lvl; let t = `${c.id} · ${c.nom}${c.k ? " [CRÍTICO]" : ""} → Nivel ${l} (${NIVELES[l]})`;
+  if (c.els && s.touched){ const no = c.els.filter((_, i) => !s.els[i]); if (no.length) t += `. Elementos no cumplidos: ${no.map(x => x.split(" ")[0]).join(", ")}`; }
+  if (c.tIdx){ const no = c.tIdx.filter(i => T_DET[i] !== true); if (no.length && c.tIdx.some(i => T_DET[i] !== null)) t += `. Trazo no cumplido: ${no.map(i => "T" + (i + 1) + " (" + TS[i] + ")").join("; ")}`; }
+  return t;
+}
+
+$("btnEnviar").addEventListener("click", async () => {
+  const filas = [...integEl.children].map(r => ({ nombre: r.querySelector(".nom").value.trim(), mail: r.querySelector(".mail").value.trim(), rol: r.querySelector(".rol").value.trim() }));
+  const grupo = $("grupo").value.trim(), fh = $("fechaHora").value;
+  if (!grupo) return msg("err", "Ingresa la sección / grupo N°.");
+  if (filas.some(f => !f.nombre)) return msg("err", "Completa el nombre de todos los integrantes.");
+  if (filas.some(f => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.mail))) return msg("err", "Ingresa un correo válido para cada integrante.");
+  if (!motivo()) return msg("err", "Marca el motivo de la revisión (aleatorio o alarma).");
+  if (!$("alerta").value) return msg("err", "Selecciona el estado de alerta.");
+  const ap = aplicables(), faltan = ap.filter(c => !ST[c.id].lvl);
+  if (faltan.length) return msg("err", "Faltan criterios por puntuar: " + faltan.map(c => c.id).join(", "));
+  if (CONFIG.WEBHOOK_URL.includes("PEGA_AQUI")) return msg("err", "Falta configurar WEBHOOK_URL en el código.");
+  const hayTrazo = HOJAS.pat.vistas.some(v => v.items.length) || HOJAS.det.vistas.some(v => v.items.length);
+  if (!hayTrazo && !confirm("No hay dibujos en la Hoja de trazado. ¿Enviar de todas formas?")) return;
+
+  const r = calcular(), nota = +notaChilena(r.pct).toFixed(1);
+  const fort = ap.filter(c => ST[c.id].lvl >= 3), mej = ap.filter(c => ST[c.id].lvl <= 2);
+  const detOk = !esAleatorio();
+  const gslug = slug(grupo), fdia = fh.slice(0, 10);
+  const subt = `${grupo} · ${fh.replace("T", " ")} · Motivo: ${motivo()} · Alerta: ${$("alerta").value}`;
+  const mec = getRadio("mec") + (getRadio("mec") === "Otro" && $("mecOtro").value ? ": " + $("mecOtro").value : "");
+  const pax = getRadio("pax") + ($("paxEsp").value ? ": " + $("paxEsp").value : "");
+
+  const payload = {
+    token: CONFIG.TOKEN, asignatura: CONFIG.ASIGNATURA, unidad: $("unidad").value, lugar: $("lugar").value,
+    fecha_hora: fh.replace("T", " "), grupo, evaluador: $("evaluador").value.trim(),
+    n_integrantes: filas.length,
+    integrantes_texto: filas.map((f, i) => `${i + 1}. ${f.nombre}${f.rol ? " — " + f.rol : ""}`).join("\n"),
+    integrantes_html: "<ol style='margin:0;padding-left:18px'>" + filas.map(f => `<li>${esc(f.nombre)}${f.rol ? " — <i>" + esc(f.rol) + "</i>" : ""}</li>`).join("") + "</ol>",
+    emails_destinatarios: filas.map(f => f.mail).join(","),
+    escenario_mecanismo: mec, escenario_motivo: motivo(), estado_alerta: $("alerta").value, escenario_pasajero: pax,
+    elemento_persona: $("elPersona").value.trim(), elemento_equipaje: $("elEquipaje").value.trim(),
+    detector_aplica: detOk ? "si" : "no",
+    puntaje_obtenido: r.pts, puntaje_maximo: r.max, porcentaje: Math.round(r.pct * 10) / 10, nota, exigencia: CONFIG.EXIGENCIA,
+    n_criterios: r.n,
+    criticos_nivel1: r.crit.map(c => `${c.id} ${c.nom}`).join("; ") || "ninguno",
+    criterios_fortalezas: fort.map(detalle).join("\n") || "(ninguno)",
+    criterios_mejora: mej.map(detalle).join("\n") || "(ninguno)",
+    criterios_detalle: ap.map(detalle).join("\n"),
+    criterios_no_aplican: CRIT.filter(c => !aplica(c)).map(c => c.id).join(", ") || "ninguno",
+    tabla_html: tablaHtml(ap),
+    trazado_patdown_texto: tTexto(T_PAT), trazado_detector_texto: detOk ? tTexto(T_DET) : "No aplica (registro aleatorio)",
+    docente_fortalezas: $("fort").value.trim(), docente_mejora: $("mejora").value.trim(), docente_compromisos: $("comp").value.trim(),
+    trazo_patdown_nombre: `trazo_patdown_${gslug}_${fdia}.png`,
+    trazo_patdown_base64: exportarHoja(HOJAS.pat, "Hoja de trazado · PAT DOWN", subt, false),
+    trazo_detector_nombre: `trazo_detector_${gslug}_${fdia}.png`,
+    trazo_detector_base64: exportarHoja(HOJAS.det, "Hoja de trazado · DETECTOR DE METAL MANUAL", subt, !detOk)
+  };
+
+  const btn = $("btnEnviar"); btn.disabled = true; msg("info", "Enviando evaluación…");
+  const opts = { method: "POST", body: JSON.stringify(payload) };
+  try {
+    const res = await fetch(CONFIG.WEBHOOK_URL, { ...opts, headers: { "Content-Type": "application/json" } });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    msg("ok", "✅ Evaluación enviada. Los integrantes recibirán el resultado y la retroalimentación por correo en unos instantes.");
+  } catch (err) {
+    try {
+      await fetch(CONFIG.WEBHOOK_URL, { ...opts, mode: "no-cors", headers: { "Content-Type": "text/plain" } });
+      msg("ok", "✅ Evaluación enviada (sin confirmación del servidor). Verifica en Make → History que el escenario se ejecutó.");
+    } catch (e2) { msg("err", "❌ No se pudo enviar: " + e2.message); }
+  } finally { btn.disabled = false; }
+});
+
+refrescar();
+</script>
+</body>
+</html>
