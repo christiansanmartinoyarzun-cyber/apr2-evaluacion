@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluación N° 2 · Vehículos y radiocomunicación · APR 2</title>
+<style>
+  :root{
+    --azul:#0b3a6e; --azul2:#1456a0; --celeste:#e8f0fb; --ok:#1b8a4b; --mal:#c0392b;
+    --gris:#5b6675; --borde:#d5dce6; --fondo:#f4f6fa;
+    --n4:#1b8a4b; --n3:#6aa84f; --n2:#e69f00; --n1:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:#1d2733}
+  header{background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;padding:18px 16px}
+  header h1{margin:0;font-size:1.2rem}
+  header p{margin:4px 0 0;font-size:.82rem;opacity:.85}
+  main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
+  .card{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .card h2{margin:0 0 12px;font-size:1.05rem;color:var(--azul)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--gris);gap:4px}
+  input[type=text],input[type=email],input[type=datetime-local],select,textarea{
+    padding:9px;border:1px solid var(--borde);border-radius:8px;font:inherit;color:#1d2733;background:#fff;width:100%}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--azul2);border-color:transparent}
+  textarea{min-height:70px;resize:vertical}
+  .hint{font-size:.78rem;color:var(--gris)}
+  button{font:inherit;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:7px 11px;cursor:pointer}
+  button:hover{background:var(--celeste)}
+  button.act{background:var(--azul);color:#fff;border-color:var(--azul)}
+  button.primary{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:600;padding:12px 22px;font-size:1rem}
+  button.primary:disabled{opacity:.55;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .score{position:sticky;top:0;z-index:20;background:#fff;border:1px solid var(--borde);border-radius:12px;padding:10px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .score b{font-size:1.25rem;color:var(--azul)}
+  .score small{display:block;color:var(--gris);font-size:.7rem}
+  .bar{flex:1;min-width:120px;height:10px;background:#e3e8ef;border-radius:6px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .2s}
+  #alertaCritica{display:none;background:#fdeeee;border:1px solid #f1c3be;color:var(--mal);padding:10px 14px;border-radius:10px;font-size:.85rem;font-weight:600}
+  /* integrantes */
+  .integ{display:grid;grid-template-columns:28px 1.3fr 1.3fr 1fr 34px;gap:8px;align-items:center;margin-bottom:8px}
+  .integ span.n{font-weight:700;color:var(--azul);text-align:center}
+  @media(max-width:700px){.integ{grid-template-columns:24px 1fr 34px}.integ .c2,.integ .c3{grid-column:2/3}}
+  /* escenario */
+  .opt{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem}
+  .opt label{display:flex;gap:6px;align-items:center;cursor:pointer}
+  .opt input{accent-color:var(--azul2)}
+  .esc{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .esc .b{border:1px solid var(--borde);border-radius:10px;padding:10px}
+  .esc .b h4{margin:0 0 6px;font-size:.82rem;color:var(--azul)}
+  /* trazado */
+  .tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .views{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .vw{text-align:center}
+  .vw h5{margin:0 0 4px;font-size:.78rem;color:var(--azul)}
+  .vw canvas{width:100%;aspect-ratio:460/560;border:2px solid var(--azul);border-radius:10px;background:#fff;touch-action:none;cursor:crosshair}
+  .vw .mini{display:flex;gap:6px;justify-content:center;margin-top:4px}
+  .vw .mini button{padding:3px 9px;font-size:.78rem}
+  .tchk{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:4px 16px;margin-top:12px}
+  .tchk .t{display:flex;gap:8px;align-items:center;font-size:.85rem;padding:5px 6px;border-bottom:1px dashed var(--borde)}
+  .tchk .t b{min-width:26px;color:var(--azul)}
+  .tchk .t span{flex:1}
+  .tchk .rd{display:flex;gap:10px;font-size:.78rem}
+  .tchk .rd label{display:flex;gap:3px;align-items:center;cursor:pointer}
+  .na{padding:14px;background:#f1f3f7;border-radius:8px;color:var(--gris);font-size:.9rem}
+  /* rúbrica */
+  .sec h3{margin:18px 0 6px;font-size:.95rem;background:var(--celeste);color:var(--azul);padding:7px 10px;border-radius:6px}
+  .cr{border:1px solid var(--borde);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  .cr.hid{display:none}
+  .cr.crit{border-left:4px solid var(--n1)}
+  .cr .top{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .cr .nom{flex:1;min-width:220px;font-size:.92rem;font-weight:600}
+  .cr .nom em{font-style:normal;font-weight:400;color:var(--gris);font-size:.74rem;display:block}
+  .tag{font-size:.68rem;padding:2px 7px;border-radius:10px;background:#e3e8ef;color:var(--azul);font-weight:700}
+  .tag.k{background:#fdeeee;color:var(--mal)}
+  .lv{display:flex;gap:6px}
+  .lv button{width:42px;height:38px;font-weight:700;font-size:1rem;border-width:2px}
+  .lv button[data-l="4"]{border-color:var(--n4);color:var(--n4)}
+  .lv button[data-l="3"]{border-color:var(--n3);color:var(--n3)}
+  .lv button[data-l="2"]{border-color:var(--n2);color:var(--n2)}
+  .lv button[data-l="1"]{border-color:var(--n1);color:var(--n1)}
+  .lv button.sel[data-l="4"]{background:var(--n4);color:#fff}
+  .lv button.sel[data-l="3"]{background:var(--n3);color:#fff}
+  .lv button.sel[data-l="2"]{background:var(--n2);color:#fff}
+  .lv button.sel[data-l="1"]{background:var(--n1);color:#fff}
+  .cur{font-size:.84rem;margin:8px 0 0;padding:8px 10px;background:#f8f9fc;border-radius:8px;min-height:20px}
+  .cur b{color:var(--azul)}
+  details.all{margin-top:6px;font-size:.78rem}
+  details.all summary{cursor:pointer;color:var(--azul2)}
+  .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin-top:6px}
+  .dgrid div{padding:8px;border-radius:8px;border:1px solid var(--borde)}
+  .dgrid div.on{outline:2px solid var(--azul2);background:var(--celeste)}
+  .dgrid div b{display:block;margin-bottom:2px}
+  .els{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px 14px;margin-top:8px}
+  .els label{display:flex;gap:8px;font-size:.84rem;align-items:flex-start;padding:3px 0;cursor:pointer}
+  .els input{width:18px;height:18px;accent-color:var(--ok);flex:none;margin-top:1px}
+  .sug{font-size:.78rem;color:var(--gris);margin-top:6px}
+  .sug a{color:var(--azul2);cursor:pointer;text-decoration:underline}
+  #estado{padding:12px;border-radius:8px;font-size:.9rem;display:none;white-space:pre-line}
+  #estado.ok{display:block;background:#eefaf3;color:var(--ok);border:1px solid #bfe5cd}
+  #estado.err{display:block;background:#fdeeee;color:var(--mal);border:1px solid #f1c3be}
+  #estado.info{display:block;background:var(--celeste);color:var(--azul);border:1px solid #c5d6ee}
+  input[type=color]{width:38px;height:34px;padding:2px;border:1px solid var(--borde);border-radius:8px;background:#fff}
+  .els input[type=checkbox]{accent-color:var(--ok)}
+  .vw canvas{max-width:420px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Instrumento de Evaluación N° 2 · Rúbrica analítica (4 niveles)</h1>
+  <p>Control e inspección de vehículos en el PCA y radiocomunicación · Apresto al Entrenamiento en Terreno (APR) 2026 · ETA-DGAC</p>
+</header>
+
+<main>
+  <div class="score" aria-live="polite">
+    <div><b id="sPuntos">0 / 0</b><small>Puntaje del grupo</small></div>
+    <div><b id="sPct">0%</b><small>Logro</small></div>
+    <div><b id="sNota">1,0</b><small>Nota (exigencia <span id="sExig"></span>%)</small></div>
+    <div><b id="sProg">0/0</b><small>Criterios puntuados</small></div>
+    <div class="bar"><i id="sBar"></i></div>
+  </div>
+  <div id="alertaCritica"></div>
+
+  <!-- I. DATOS -->
+  <section class="card">
+    <h2>I. Datos de la evaluación e integrantes del grupo</h2>
+    <div class="grid">
+      <label class="f">Carrera<input type="text" value="Técnico de Nivel Superior en Seguridad Aeroportuaria" readonly></label>
+      <label class="f">Módulo<input type="text" value="Apresto al Entrenamiento en Terreno (APR) – 2026, 2.º semestre" readonly></label>
+      <label class="f">Unidad<input type="text" id="unidad" value="B - Operación de equipos en Puestos de Control de Acceso (PCA)"></label>
+      <label class="f">Lugar / puesto<input type="text" id="lugar" value="PCA de entrenamiento / sala de comunicaciones"></label>
+      <label class="f">Fecha y hora<input type="datetime-local" id="fechaHora"></label>
+      <label class="f">Sección / grupo N° *<input type="text" id="grupo" placeholder="Ej: Sección 1 · Grupo 3"></label>
+      <label class="f">Docente evaluador<input type="text" id="evaluador" value="Christian San Martín Oyarzún"></label>
+    </div>
+    <h4 style="margin:16px 0 6px;color:var(--azul);font-size:.9rem">Integrantes del grupo (3 a 4 estudiantes) *</h4>
+    <div id="integrantes"></div>
+    <button type="button" id="btnAddInt">+ Agregar integrante</button>
+  </section>
+
+  <!-- III. ESCENARIO -->
+  <section class="card">
+    <h2>III. Condiciones del escenario <span class="hint">(marcar antes de iniciar)</span></h2>
+    <div class="esc">
+      <div class="b"><h4>Mecanismo de definición</h4>
+        <div class="opt">
+          <label><input type="radio" name="mec" value="Definido por el docente" checked> Definido por el docente</label>
+          <label><input type="radio" name="mec" value="Sorteado (dado)"> Sorteado (dado)</label>
+          <label><input type="radio" name="mec" value="Sorteado (fichas)"> Sorteado (fichas)</label>
+          <label><input type="radio" name="mec" value="Otro"> Otro</label>
+        </div>
+        <input type="text" id="mecOtro" placeholder="Si es otro, especifica" style="margin-top:6px">
+      </div>
+      <div class="b"><h4>Modalidad del control *</h4>
+        <div class="opt" style="flex-direction:column;gap:6px">
+          <label><input type="radio" name="motivo" value="ALEATORIO e imprevisible"> ALEATORIO e imprevisible</label>
+          <label><input type="radio" name="motivo" value="INSPECCIÓN TOTAL (vehículo no operacional que proviene del área pública)"> INSPECCIÓN TOTAL (vehículo no operacional que proviene del área pública)</label>
+          <label><input type="radio" name="motivo" value="Ingreso programado (ETV o ambulancia)"> Ingreso programado (ETV o ambulancia)</label>
+        </div>
+        <h4 style="margin-top:10px">Tipo de vehículo</h4>
+        <div class="opt">
+          <label><input type="radio" name="pax" value="Operacional" checked> Operacional</label>
+          <label><input type="radio" name="pax" value="No operacional"> No operacional</label>
+          <label><input type="radio" name="pax" value="Ambulancia"> Ambulancia</label>
+          <label><input type="radio" name="pax" value="Empresa de transporte de valores (ETV)"> ETV</label>
+          <label><input type="radio" name="pax" value="Otro"> Otro</label>
+        </div>
+        <input type="text" id="paxEsp" placeholder="Si es otro, especifica" style="margin-top:6px">
+      </div>
+      <div class="b"><h4>Estado de alerta *</h4>
+        <select id="alerta">
+          <option value="">Selecciona…</option>
+          <option>Azul</option><option>Verde</option><option>Amarillo</option><option>Naranja</option><option>Rojo</option>
+        </select>
+        <p class="hint" id="alertaInfo" style="margin:6px 0 0">Selección aleatoria de vehículos y áreas a inspeccionar según el estado de alerta (sugerencia docente; mínimo normativo: 3 áreas, PRO 17 00 10.6.2 y 10.6.4).</p>
+        <h4 style="margin-top:10px">Áreas seleccionadas por el estudiante (PRO 17 00, 10.6.2)</h4>
+        <div class="opt" style="flex-direction:column;gap:4px" id="areas">
+          <label><input type="checkbox" value="a) Cavidades de puertas delanteras, visera y guantero"> a) Cavidades de puertas delanteras, visera y guantero</label>
+          <label><input type="checkbox" value="b) Bolsillos de asientos, espacio para los pies y bajo los asientos"> b) Bolsillos de asientos, pies y bajo los asientos</label>
+          <label><input type="checkbox" value="c) Maletero / compartimiento de carga"> c) Maletero / compartimiento de carga</label>
+          <label><input type="checkbox" value="d) Cárter de ruedas"> d) Cárter de ruedas</label>
+          <label><input type="checkbox" value="e) Compartimiento del motor"> e) Compartimiento del motor</label>
+          <label><input type="checkbox" value="f) Parte inferior del vehículo"> f) Parte inferior del vehículo</label>
+          <label><input type="checkbox" value="g) Otra parte"> g) Otra parte</label>
+        </div>
+      </div>
+      <div class="b"><h4>Vehículo / hallazgo dispuesto por el docente</h4>
+        <label class="f">Patente y ocupantes<input type="text" id="elPersona" placeholder="Ej: patente, N° de ocupantes"></label>
+        <label class="f" style="margin-top:6px">Elemento o novedad dispuesta<input type="text" id="elEquipaje"></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- V. CROQUIS -->
+  <section class="card">
+    <h2>V. Croquis de trazado de la parte inferior del vehículo <span class="hint">(se comienza en la puerta del conductor “C”, hacia atrás, y se termina en el mismo punto · inicio con “X”, término con flecha)</span></h2>
+    <div class="row" style="margin-bottom:10px">
+      <button type="button" id="tLapiz" class="act">✏️ Lápiz</button>
+      <button type="button" id="tX">✖ Inicio (X)</button>
+      <button type="button" id="tFlecha">➤ Término (flecha)</button>
+      <input type="color" id="color" value="#d62828" title="Color">
+      <select id="grosor" style="width:auto" title="Grosor"><option value="3">Fino</option><option value="5" selected>Medio</option><option value="8">Grueso</option></select>
+      <span class="hint">La flecha se orienta según el final del último trazo. El croquis se envía como adjunto 1.</span>
+    </div>
+    <div id="hojaVeh" style="max-width:420px;margin:0 auto"></div>
+  </section>
+
+  <!-- VI. RÚBRICA -->
+  <section class="card">
+    <h2>VI. Rúbrica de evaluación <span class="hint">(puntaje del grupo: 4 · 3 · 2 · 1)</span></h2>
+    <p class="hint" style="margin-top:-6px">Un error crítico de cualquier integrante cuenta como error crítico del grupo. Criterios ★ críticos: A3 (trato al conductor), B6 (hallazgos) y C5 (reserva de información). En criterios con elementos observables o trazo (T1–T5), el nivel se sugiere automáticamente y puedes corregirlo.</p>
+    <div id="rubrica"></div>
+  </section>
+
+  <!-- VII. RETROALIMENTACIÓN -->
+  <section class="card">
+    <h2>VII. Retroalimentación del evaluador</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+      <label class="f">Fortalezas observadas<textarea id="fort"></textarea></label>
+      <label class="f">Aspectos para mejorar / retroalimentación<textarea id="mejora"></textarea></label>
+      <label class="f">Compromisos de mejora<textarea id="comp"></textarea></label>
+    </div>
+    <p class="hint">Estas observaciones se entregan a la IA como insumo y se incluyen en el correo.</p>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <button type="button" id="btnEnviar" class="primary">📨 Enviar evaluación al grupo</button>
+      <span class="hint">Se envía a todos los integrantes, con copia al docente evaluador.</span>
+    </div>
+    <div id="estado" style="margin-top:12px"></div>
+  </section>
+</main>
+
+<script>
+/* ===================== CONFIGURACIÓN ===================== */
+const CONFIG = {
+  WEBHOOK_URL: "https://hook.us2.make.com/4w4lqif8mv9b8h5xmk2gb410sr9utyqn",
+  TOKEN: "apr2b-17a89390c230cfa6dbedec97",
+  EXIGENCIA: 60,
+  ASIGNATURA: "Apresto al Entrenamiento en Terreno (APR) 2026 · Evaluación N° 2",
+  TITULO: "Evaluación N° 2 · Control de vehículos y radiocomunicación"
+};
+
+/* ===================== DATOS DE LA RÚBRICA ===================== */
+const NIVELES = {4:"Logrado destacado", 3:"Logrado", 2:"Parcialmente logrado", 1:"No logrado"};
+const SECS = {
+  A: "A. CONTROL DOCUMENTAL, SELECCIÓN DE ÁREAS Y TRATO AL CONDUCTOR",
+  B: "B. INSPECCIÓN DEL VEHÍCULO – PRO 17 00, 10.6 (se puntúa sobre las áreas que el estudiante selecciona; mínimo 3)",
+  C: "C. OPERACIÓN DE EQUIPOS DE COMUNICACIONES Y COMUNICACIÓN ASERTIVA POR RADIO"
+};
+const TS = [
+  "Inicia en la puerta del conductor (punto C del croquis)",
+  "Avanza de forma continua hacia la parte posterior del vehículo",
+  "Finaliza en el mismo punto donde comenzó (cierra el circuito)",
+  "Revisa el cárter de las cuatro ruedas",
+  "Inspecciona la parte inferior completa (ejes, chasis, tren de transmisión; usa espejo)"
+];
+const SIT = [
+  "Olimpo informa a usted (PAPA 5) que en 05 minutos llega al PCA una ambulancia.",
+  "Usted (PAPA 4) notifica a Olimpo la presencia de un bulto abandonado en estacionamiento remoto 40.",
+  "Usted (PAPA 4) informa a Olimpo la llegada de un vehículo blindado al PCA.",
+  "El fiscalizador (usted) informa al PCA (PAPA 4) que un vehículo de escolta presidencial saldrá por ese puesto.",
+  "Usted (PAPA 4) notifica a Olimpo un accidente de tránsito en las cercanías del puesto.",
+  "Olimpo informa a usted (PAPA 4) que ingresará una grúa horquilla de la empresa Swissport por su puesto.",
+  "Usted (Olimpo) notifica al PCA 3 (PAPA 3) que a las 16:00 h hará ingreso por el sector vehículos el vehículo de una embajada."
+];
+
+/* generadores de niveles (misma regla que el instrumento en Word) */
+function thr(n){ let k3 = Math.ceil(.75 * n); if (k3 >= n) k3 = n - 1; let k2 = Math.ceil(.5 * n); if (k2 >= k3) k2 = k3 - 1; k2 = Math.max(k2, 1); return [n, k3, k2]; }
+const rg = (lo, hi) => lo === hi ? `${lo}` : `${lo} a ${hi}`;
+function listLv(items, crit){
+  const n = items.length, [, k3, k2] = thr(n);
+  return { th: [n, k3, k2], els: items.map((t, i) => `E${i + 1} ${t}`), d: [
+    `Cumple los ${n} elementos observables (E1 a E${n}), sin ayuda del evaluador y en el orden indicado.`,
+    `Cumple ${rg(k3, n - 1)} de ${n} elementos, sin ayuda. Las omisiones son menores y no comprometen la detección.`,
+    `Cumple ${rg(k2, k3 - 1)} de ${n} elementos, o requiere recordatorios del evaluador para completar la secuencia.`,
+    `Cumple ${rg(0, k2 - 1)} de ${n} elementos, o comete un error crítico${crit ? " (" + crit + ")" : ""}.`] };
+}
+function pctLv(items, what){
+  return { pct: true, els: items.map((t, i) => `E${i + 1} ${t}`), d: [
+    `Cumple el 100 % de los elementos observables de ${what}, sin ayuda del evaluador.`,
+    `Cumple entre el 75 % y el 99 % de los elementos de ${what}; omisiones menores que no comprometen la detección.`,
+    `Cumple entre el 50 % y el 74 % de los elementos de ${what}, o requiere recordatorios del evaluador.`,
+    `Cumple menos del 50 % de los elementos de ${what}, o comete un error crítico.`] };
+}
+const CRIT = [];
+function add(id, sec, t, nom, ref, lv, k){ CRIT.push(Object.assign({ id, sec, t, nom, ref, k: !!k }, lv)); }
+
+add("A1","A","C","Verificación documental y autorización de ingreso (PAV, TICA, coordinación previa)","PRO 17 00, 10.6.1; material de clase Unidad B (PAV, ETV, ambulancias)",{d:[
+ "Verifica que el PAV esté vigente y visible, la TICA del conductor y de cada ocupante y la autorización de ingreso; identifica el tipo de vehículo (operacional, no operacional, ambulancia, ETV) y aplica la coordinación correspondiente (ETV gestionada con 24 h de anticipación y sin escolta; ambulancia escoltada por el S.A.M.).",
+ "Verifica PAV, TICA y autorización, pero omite contrastar a un ocupante o precisar la coordinación del tipo de vehículo.",
+ "Verifica solo parte de la documentación (p. ej., PAV sin TICA de los ocupantes) o requiere ayuda para identificar el tipo de vehículo.",
+ "No verifica la documentación, acepta documentos vencidos o inexistentes, o permite avanzar al vehículo sin autorización."]});
+add("A2","A","C","Selección del alcance y de las áreas según aleatoriedad y estado de alerta","PRO 17 00, 10.6.1–10.6.5; 8.11.12",{d:[
+ "Declara si el control es aleatorio o total (vehículo no operacional que proviene del área pública); selecciona al menos tres áreas de las siete del PRO (10.6.2) e incrementa su número según el estado de alerta; incluye al menos un área distinta a las del vehículo anterior (imprevisibilidad) y fundamenta oralmente su selección.",
+ "Selecciona al menos tres áreas y declara la modalidad, pero no ajusta el número de áreas al estado de alerta o no fundamenta la variación.",
+ "Selecciona menos de tres áreas, o repite siempre las mismas áreas que en el vehículo anterior.",
+ "Inspecciona sin método de selección, o autoriza el ingreso sin inspeccionar."]});
+add("A3","A","A","Consentimiento, trato y comunicación con el conductor","Material de clase Unidad B (cómo se inspecciona un vehículo)",{d:[
+ "Saluda, se identifica, explica el motivo de la inspección y obtiene el consentimiento del conductor antes de revisar; da instrucciones claras y corteses, atiende las consultas y agradece la colaboración al finalizar.",
+ "Obtiene el consentimiento y da instrucciones claras, pero omite explicar el motivo o agradecer.",
+ "Da instrucciones ambiguas, no explica el motivo y obtiene el consentimiento solo cuando el conductor lo pregunta.",
+ "Inspecciona sin informar ni obtener el consentimiento, o trata al conductor de forma brusca o descortés."]}, true);
+add("B1","B","H","Preparación de la inspección y control de ocupantes y objetos transportados","PRO 17 00, 10.6.6; procedimiento local del PCA",
+ listLv(["Indica con claridad dónde detener el vehículo y solicita apagar el motor","Solicita al conductor y a los ocupantes descender y abrir puertas, capó y maletero o compartimiento de carga","Identifica y controla a los ocupantes (TICA)","Inspecciona los objetos y elementos transportados","Mantiene visión de los ocupantes durante toda la inspección","Ubica al conductor en un lugar seguro y visible, fuera de la trayectoria de otros vehículos"],"inspecciona con los ocupantes sin control a bordo"));
+add("B2","B","H","Inspección de la cabina","PRO 17 00, 10.6.2 a y b",
+ pctLv(["Cavidades de las puertas delanteras","Visera para el sol","Guantero","Bolsillos de los asientos","Espacio para los pies","Espacio debajo de los asientos"],"las áreas de cabina seleccionadas"));
+add("B3","B","H","Inspección del maletero o compartimiento de carga, del motor y de otras partes","PRO 17 00, 10.6.2 c, e y 10.6.3",
+ pctLv(["Maletero, baúl, equipaje o compartimiento de carga","Bultos, cajas y equipaje transportados","Compartimiento del motor","Cualquier otra parte no incluida en la lista (techo, parachoques, depósito u otros)"],"las áreas seleccionadas de carga, motor u otras partes"));
+(function(){
+  const lv = listLv(["Inicia en la puerta del conductor (punto C del croquis)","Avanza de forma continua hacia la parte posterior del vehículo","Finaliza en el mismo punto donde comenzó (cierra el circuito)","Revisa el cárter de las cuatro ruedas","Inspecciona toda la parte inferior del vehículo (ejes, chasis, tren de transmisión)"],"no inspecciona la parte inferior ni el cárter de ruedas cuando los seleccionó");
+  delete lv.els; delete lv.th; lv.tIdx = [0,1,2,3,4];
+  add("B4","B","H","Cárter de ruedas y parte inferior del vehículo (trazo del croquis, T1 a T5)","PRO 17 00, 10.6.2 d y f; material de clase Unidad B", lv);
+})();
+add("B5","B","H","Uso de medios técnicos y protección personal","PRO 17 00, 10.6.5; material de clase Unidad B (revisión con espejo)",{d:[
+ "Usa espejo de inspección y linterna u otros medios técnicos disponibles en las áreas de difícil acceso, usa guantes y chaleco reflectante, se ubica fuera de la trayectoria de otros vehículos y mantiene el equipo y el orden del puesto durante toda la inspección.",
+ "Usa los medios técnicos y la protección, pero omite uno en un área puntual (p. ej., revisa un cárter sin espejo).",
+ "Usa medios técnicos solo cuando el evaluador lo indica, o se expone a la trayectoria de otros vehículos en una ocasión.",
+ "No usa medios técnicos en las áreas de difícil acceso, no usa protección personal o se expone repetidamente a un riesgo."]});
+add("B6","B","C","Manejo de hallazgos y elementos sospechosos en el vehículo","PRO 17 00, 8.20.1–8.20.4; 10.6.6",{d:[
+ "Ante un elemento prohibido o sospechoso detiene la inspección, impide el ingreso del vehículo a la zona de seguridad restringida, mantiene la calma, aleja a los ocupantes, informa de inmediato a la Central de Comunicaciones y al encargado, y aplica el procedimiento (descarte de amenaza o plan de contingencia si corresponde).",
+ "Realiza los pasos esenciales, pero omite uno secundario (p. ej., el orden de la cadena de notificación).",
+ "Informa, pero demora la notificación o manipula el elemento antes de informar.",
+ "No detecta el elemento, lo manipula o permite el ingreso del vehículo sin resolver la alerta."]}, true);
+add("B7","B","H","Decisión de ingreso, coordinación y cierre del control","Material de clase Unidad B (ETV, ambulancias, S.A.M.)",{d:[
+ "Comunica el resultado (autoriza, deniega o deriva), coordina con la Central de Comunicaciones y, cuando corresponde, con el S.A.M. (ambulancia: ingresa escoltada; ETV: ingresa no escoltada y vigilada a distancia/CCTV), controla el ingreso de personas y vehículo y devuelve la documentación.",
+ "Comunica y coordina correctamente, pero omite un paso de cierre (p. ej., devolver documentación o confirmar con la Central).",
+ "Confunde el tratamiento de escolta entre ambulancias y ETV, o coordina solo después de un recordatorio.",
+ "Autoriza o deniega sin coordinar con la Central ni verificar el resultado de la inspección."]});
+add("B8","B","H","Completar el Formulario de Control de Acceso de Vehículos y Personas Externos","Material de clase Unidad B (formulario del PCA; verificar formato vigente del aeródromo)",
+ listLv(["Fecha y hora del control","Tipo de vehículo, patente o identificación","Empresa o institución","Conductor y ocupantes (nombre y TICA)","Motivo del ingreso","Destino o sector de la zona de seguridad restringida","Áreas inspeccionadas","Resultado de la inspección","Nombre y firma del funcionario que autoriza","Observaciones o novedades"],"deja en blanco los datos del conductor o del resultado"));
+add("C1","C","H","Operación del equipo de radiocomunicación","Material de clase Unidad B (partes del radio; bandas de frecuencia AVSEC)",
+ listLv(["Enciende el equipo y verifica la batería y su funcionamiento","Selecciona el canal o frecuencia asignada al servicio AVSEC","Ajusta el volumen y escucha que el canal esté libre antes de transmitir","Usa el botón de transmisión (PTT) correctamente y espera un instante antes de hablar","Sostiene el micrófono a distancia adecuada y habla con voz clara","Identifica y nombra las partes del radio (antena, selector de canal, volumen, PTT, batería)","Realiza una prueba de comunicación con la Central"],"transmite en un canal no asignado"));
+add("C2","C","H","Estructura del mensaje: RECEPTOR – EMISOR – MENSAJE","Material de clase Unidad B (transmisión de mensajes)",
+ listLv(["Nombra primero al receptor (a quién se llama)","Se identifica como emisor (quién llama)","Entrega el mensaje solo después de recibir la autorización (“prosiga”)","Transmite el mensaje de forma ordenada (qué, dónde, cuándo)","Confirma la recepción del mensaje o solicita su repetición cuando corresponde"],"entrega el mensaje sin identificar al receptor ni al emisor"));
+add("C3","C","H","Fraseología y alfabeto radiotelefónico OACI","Material de clase Unidad B (alfabeto radiotelefónico OACI)",
+ listLv(["Usa los designadores correctos (p. ej., OLIMPO, PAPA 4)","Usa palabras estándar de fraseología (p. ej., prosiga, recibido, afirmativo, negativo, repita)","Usa el alfabeto radiotelefónico OACI para patentes, siglas y matrículas","Transmite las cifras dígito a dígito","Evita lenguaje coloquial, abreviaturas y comentarios no operativos"],"usa designadores equivocados que pueden derivar en confusión operativa"));
+add("C4","C","A","Comunicación asertiva por radio","Material de clase Unidad B; Programa Apresto (manejo de conflictos)",{d:[
+ "Transmite mensajes claros, concisos y precisos (qué, dónde, cuándo, cuántos), con tono sereno y respetuoso aun bajo presión; expresa hechos sin juicios ni ironía; escucha activamente, pide repetición cuando no entiende y no interrumpe transmisiones ajenas; prioriza la urgencia del mensaje.",
+ "Mensajes claros y respetuosos, pero con una imprecisión (dato faltante o redundancia) o un tono tenso en una transmisión.",
+ "Mensajes extensos o ambiguos que obligan a repetirlos; tono tenso o impaciente en varias transmisiones; no prioriza la urgencia.",
+ "Mensajes confusos, con juicios o lenguaje inapropiado; interrumpe a otros o responde con agresividad."]});
+CRIT[CRIT.length - 1].t = "A";
+add("C5","C","A","Disciplina de radio y reserva de la información de seguridad","PRO 17 00, 11.2 (clasificación de documentos de seguridad)",{d:[
+ "Mantiene el canal despejado (solo comunicaciones operativas), transmite en los turnos que corresponde y no divulga información de seguridad clasificada (p. ej., procedimientos operativos, estados de alerta) por canales o a personas no autorizadas; cuida el equipo y lo entrega operativo.",
+ "Respeta la disciplina de radio, con un uso innecesario del canal o un comentario no operativo puntual.",
+ "Ocupa el canal sin necesidad o transmite información sensible sin verificar la pertinencia, y rectifica con ayuda del evaluador.",
+ "Divulga información de seguridad clasificada o usa el canal para fines no operativos de forma reiterada."]}, true);
+(function(){
+  const lv = listLv(["Comunica correctamente el hecho o la novedad (qué ocurre)","Indica el lugar con precisión (puesto, sector o estacionamiento)","Indica la hora o el tiempo estimado cuando corresponde","Identifica el vehículo, la empresa o el número de personas involucradas","Informa o solicita la acción necesaria (apoyo, ingreso, escolta)","Cierra con confirmación de recepción"],"transmite un dato operativo erróneo");
+  lv.c6 = true;
+  add("C6","C","H","Transmisión de situaciones operativas (2 situaciones sorteadas)","Material de clase Unidad B (ejercicio de transmisión de mensajes)", lv);
+})();
+// dominios según el instrumento: A3 y C4/C5 = actitudes; A1, A2, B6 = conocimientos
+CRIT.find(c => c.id === "A3").t = "A"; CRIT.find(c => c.id === "C4").t = "A"; CRIT.find(c => c.id === "C5").t = "A";
+CRIT.find(c => c.id === "C1").t = "H"; CRIT.find(c => c.id === "C2").t = "H"; CRIT.find(c => c.id === "C3").t = "H";
+
+/* ===================== UTILIDADES ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "");
+const getRadio = n => (document.querySelector(`input[name="${n}"]:checked`) || {}).value || "";
+
+/* ===================== INTEGRANTES ===================== */
+const integEl = $("integrantes");
+function addInt(){
+  if (integEl.children.length >= 4) return;
+  const row = document.createElement("div"); row.className = "integ";
+  row.innerHTML = `<span class="n"></span>
+    <input type="text" class="c1 nom" placeholder="Nombres y apellidos">
+    <input type="email" class="c2 mail" placeholder="correo@estudiante.cl">
+    <input type="text" class="c3 rol" placeholder="Rol(es) en el escenario">
+    <button type="button" title="Quitar">✕</button>`;
+  row.querySelector("button").onclick = () => { if (integEl.children.length > 3) { row.remove(); renum(); } };
+  integEl.appendChild(row); renum();
+}
+function renum(){ [...integEl.children].forEach((r, i) => r.querySelector(".n").textContent = i + 1); $("btnAddInt").style.display = integEl.children.length >= 4 ? "none" : ""; }
+$("btnAddInt").onclick = addInt; addInt(); addInt(); addInt();
+(function(){ const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $("fechaHora").value = d.toISOString().slice(0, 16); })();
+
+const ALERTAS = {Azul:"1 de cada 20 vehículos · 3 áreas", Verde:"2 de cada 20 · 3 áreas", Amarillo:"4 de cada 20 · 4 áreas", Naranja:"5 de cada 20 · 5 áreas", Rojo:"10 de cada 20 · 6 o más áreas, hasta la inspección total"};
+$("alerta").onchange = () => { $("alertaInfo").textContent = $("alerta").value ? `Alerta ${$("alerta").value}: ${ALERTAS[$("alerta").value]} (sugerencia docente; mínimo normativo: 3 áreas).` : "Selección aleatoria de vehículos y áreas a inspeccionar según el estado de alerta (sugerencia docente; mínimo normativo: 3 áreas, PRO 17 00 10.6.2 y 10.6.4)."; };
+
+/* ===================== ESTADO DE LA RÚBRICA ===================== */
+const ST = {};
+CRIT.forEach(c => ST[c.id] = { lvl: null, manual: false, touched: false, els: Array(c.c6 ? 12 : (c.els || []).length).fill(false), ns: Array((c.els || []).length).fill(false) });
+const T_VEH = Array(5).fill(null);
+const motivo = () => getRadio("motivo");
+const aplica = c => true;
+function nivelPorConteo(n, th){ return n >= th[0] ? 4 : n >= th[1] ? 3 : n >= th[2] ? 2 : 1; }
+function sugerido(c){
+  const s = ST[c.id];
+  if (c.tIdx){
+    const arr = c.tIdx.map(i => T_VEH[i]);
+    if (arr.every(v => v === null)) return null;
+    return nivelPorConteo(arr.filter(v => v === true).length, [5, 4, 3]);
+  }
+  if (!s.touched) return null;
+  if (c.c6){ const a = s.els.slice(0, 6).filter(Boolean).length, b = s.els.slice(6).filter(Boolean).length; return nivelPorConteo(Math.floor((a + b) / 2), c.th); }
+  if (c.pct){
+    const tot = c.els.filter((_, i) => !s.ns[i]).length; if (!tot) return null;
+    const ok = c.els.filter((_, i) => !s.ns[i] && s.els[i]).length, p = ok / tot * 100;
+    return p >= 100 ? 4 : p >= 75 ? 3 : p >= 50 ? 2 : 1;
+  }
+  if (c.els) return nivelPorConteo(s.els.filter(Boolean).length, c.th);
+  return null;
+}
+function autoNivel(c){ const s = ST[c.id]; if (s.manual) return; const g = sugerido(c); if (g !== null) s.lvl = g; }
+
+/* ===================== RENDER RÚBRICA ===================== */
+const rubEl = $("rubrica");
+const secBox = {};
+Object.keys(SECS).forEach(k => {
+  const d = document.createElement("div"); d.className = "sec"; d.id = "sec" + k;
+  d.innerHTML = `<h3>${esc(SECS[k])}</h3>`; rubEl.appendChild(d); secBox[k] = d;
+});
+const crEl = {};
+CRIT.forEach(c => {
+  const el = document.createElement("div"); el.className = "cr" + (c.k ? " crit" : ""); crEl[c.id] = el;
+  const dom = {C:"Conocimientos", H:"Habilidades", A:"Actitudes"}[c.t];
+  let extra = "";
+  if (c.c6){
+    extra = [0, 1].map(g => `<div style="margin-top:8px"><label class="f" style="flex-direction:row;align-items:center;gap:8px"><b style="color:var(--azul)">Situación ${g + 1}:</b>
+      <select id="sit${g}" data-g="${g}">${SIT.map((t, i) => `<option value="${i + 1}"${i === g ? " selected" : ""}>${i + 1}. ${esc(t)}</option>`).join("")}</select></label>
+      <div class="els">${c.els.map((t, i) => `<label><input type="checkbox" data-k="e" data-i="${g * 6 + i}"><span>${esc(t)}</span></label>`).join("")}</div></div>`).join("");
+  } else if (c.pct){
+    extra = `<div class="els" style="grid-template-columns:1fr">${c.els.map((t, i) => `<div style="display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><label><input type="checkbox" data-k="e" data-i="${i}"><span>${esc(t)}</span></label><label style="color:var(--gris);font-size:.78rem"><input type="checkbox" data-k="n" data-i="${i}"><span>no seleccionada</span></label></div>`).join("")}</div>`;
+  } else if (c.els){
+    extra = `<div class="els">${c.els.map((t, i) => `<label><input type="checkbox" data-k="e" data-i="${i}"><span>${esc(t)}</span></label>`).join("")}</div>`;
+  } else if (c.tIdx) extra = `<div class="sug" data-tsum></div>`;
+  el.innerHTML = `
+    <div class="top">
+      <div class="nom">${c.id} · ${esc(c.nom)}${c.k ? " ★" : ""}<em>${esc(c.ref)}</em></div>
+      <span class="tag">${dom}</span>${c.k ? '<span class="tag k">CRÍTICO</span>' : ""}
+      <div class="lv">${[4,3,2,1].map(n => `<button type="button" data-l="${n}" title="${NIVELES[n]}">${n}</button>`).join("")}</div>
+    </div>
+    ${extra}
+    <div class="sug" data-sug></div>
+    <div class="cur" data-cur>Selecciona un nivel.</div>
+    <details class="all"><summary>Ver descriptores de los 4 niveles</summary>
+      <div class="dgrid">${[4,3,2,1].map((n, i) => `<div data-n="${n}"><b>Nivel ${n} · ${NIVELES[n]}</b>${esc(c.d[i])}</div>`).join("")}</div>
+    </details>`;
+  el.querySelectorAll(".lv button").forEach(b => b.onclick = () => { ST[c.id].lvl = +b.dataset.l; ST[c.id].manual = !!(c.els || c.tIdx); refrescar(); });
+  el.querySelectorAll(".els input").forEach(cb => cb.onchange = () => {
+    const i = +cb.dataset.i, s = ST[c.id];
+    if (cb.dataset.k === "n"){ s.ns[i] = cb.checked; if (cb.checked){ s.els[i] = false; const e = el.querySelector(`input[data-k="e"][data-i="${i}"]`); if (e) e.checked = false; } }
+    else { s.els[i] = cb.checked; if (cb.checked && c.pct){ s.ns[i] = false; const n = el.querySelector(`input[data-k="n"][data-i="${i}"]`); if (n) n.checked = false; } }
+    s.touched = true; autoNivel(c); refrescar();
+  });
+  secBox[c.sec].appendChild(el);
+});
+function pintarCriterio(c){
+  const el = crEl[c.id], s = ST[c.id];
+  el.querySelectorAll(".lv button").forEach(b => b.classList.toggle("sel", s.lvl === +b.dataset.l));
+  const cur = el.querySelector("[data-cur]");
+  cur.innerHTML = s.lvl ? `<b>Nivel ${s.lvl} · ${NIVELES[s.lvl]}:</b> ${esc(c.d[4 - s.lvl])}` : "Selecciona un nivel.";
+  el.querySelectorAll(".dgrid div").forEach(d => d.classList.toggle("on", +d.dataset.n === s.lvl));
+  const sug = el.querySelector("[data-sug]"), g = sugerido(c);
+  if (g !== null){
+    sug.innerHTML = `Nivel sugerido por el conteo: <b>${g}</b>` + (s.manual && s.lvl !== g ? ` · <a data-re>usar sugerido</a>` : "");
+    const a = sug.querySelector("[data-re]"); if (a) a.onclick = () => { s.manual = false; s.lvl = g; refrescar(); };
+  } else sug.textContent = "";
+  if (c.tIdx){
+    const n = c.tIdx.filter(i => T_VEH[i] === true).length;
+    el.querySelector("[data-tsum]").innerHTML = `Verificación en el croquis del vehículo: <b>${n} de 5</b> cumplidos (${c.tIdx.map(i => "T" + (i + 1)).join(", ")}).`;
+  }
+}
+function aplicables(){ return CRIT.slice(); }
+function calcular(){
+  const ap = aplicables(), pts = ap.reduce((s, c) => s + (ST[c.id].lvl || 0), 0);
+  const done = ap.filter(c => ST[c.id].lvl).length, max = ap.length * 4;
+  const pct = max ? pts / max * 100 : 0;
+  $("sPuntos").textContent = `${pts} / ${max}`;
+  $("sPct").textContent = `${pct.toFixed(0)}%`;
+  $("sNota").textContent = done === ap.length && ap.length ? notaChilena(pct).toFixed(1).replace(".", ",") : "—";
+  $("sProg").textContent = `${done}/${ap.length}`;
+  $("sBar").style.width = pct + "%";
+  const crit = ap.filter(c => c.k && ST[c.id].lvl === 1);
+  const al = $("alertaCritica");
+  if (crit.length){ al.style.display = "block"; al.textContent = `⚠ Criterio crítico en nivel 1 (${crit.map(c => c.id).join(", ")}): aplicar la regla del resumen según el reglamento de evaluación de la Escuela.`; }
+  else al.style.display = "none";
+  return { pts, max, pct, done, n: ap.length, crit };
+}
+function notaChilena(pct){
+  const e = CONFIG.EXIGENCIA;
+  const n = pct >= e ? 4 + 3 * (pct - e) / (100 - e) : 1 + 3 * pct / e;
+  return Math.max(1, Math.min(7, n));
+}
+function refrescar(){
+  CRIT.forEach(c => { if (c.tIdx || c.els) autoNivel(c); });
+  CRIT.forEach(pintarCriterio);
+  calcular();
+}
+$("sExig").textContent = CONFIG.EXIGENCIA;
+document.querySelectorAll("select[id^=sit]").forEach(s => s.onchange = refrescar);
+
+/* ===================== CROQUIS DEL VEHÍCULO ===================== */
+let tool = "lapiz";
+function setTool(t){
+  tool = t;
+  $("tLapiz").classList.toggle("act", t === "lapiz");
+  $("tX").classList.toggle("act", t === "x");
+  $("tFlecha").classList.toggle("act", t === "flecha");
+}
+$("tLapiz").onclick = () => setTool("lapiz"); $("tX").onclick = () => setTool("x"); $("tFlecha").onclick = () => setTool("flecha");
+
+const CW = 400, CH = 600;
+function rr(c, x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+function vehiculo(c){
+  c.save(); c.scale(CW / 600, CH / 900);
+  c.fillStyle = "#eef1f6"; c.strokeStyle = "#5b6675"; c.lineJoin = "round"; c.lineCap = "round";
+  c.lineWidth = 5; rr(c, 150, 100, 300, 700, 90); c.fill(); c.stroke();
+  c.lineWidth = 3; c.fillStyle = "#fff";
+  c.beginPath(); c.moveTo(185, 260); c.lineTo(415, 260); c.lineTo(400, 340); c.lineTo(200, 340); c.closePath(); c.fill(); c.stroke();
+  c.beginPath(); c.moveTo(200, 640); c.lineTo(400, 640); c.lineTo(415, 715); c.lineTo(185, 715); c.closePath(); c.fill(); c.stroke();
+  c.strokeRect(200, 350, 200, 280);
+  c.fillStyle = "#c9d1de"; c.lineWidth = 4;
+  [[105, 170], [105, 650], [455, 170], [455, 650]].forEach(([x, y]) => { rr(c, x, y, 40, 105, 8); c.fill(); c.stroke(); });
+  c.fillStyle = "#1d2733"; c.textAlign = "center";
+  c.font = "bold 40px system-ui,Arial"; c.fillText("FRENTE", 300, 70); c.fillText("ATRÁS", 300, 862);
+  c.font = "bold 56px system-ui,Arial"; c.fillText("C", 85, 395);
+  c.strokeStyle = "#d62828"; c.lineWidth = 9; c.beginPath(); c.moveTo(150, 330); c.lineTo(150, 420); c.stroke();
+  c.restore();
+}
+function dibujarItems(c, items){
+  items.forEach(it => {
+    c.save(); c.strokeStyle = it.color; c.fillStyle = it.color;
+    if (it.type === "stroke"){
+      c.lineWidth = it.size; c.lineCap = "round"; c.lineJoin = "round"; c.beginPath();
+      it.pts.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y));
+      if (it.pts.length === 1) c.lineTo(it.pts[0].x + .1, it.pts[0].y + .1);
+      c.stroke();
+    } else if (it.type === "x"){
+      c.lineWidth = 5; c.lineCap = "round"; c.beginPath();
+      c.moveTo(it.x - 11, it.y - 11); c.lineTo(it.x + 11, it.y + 11); c.moveTo(it.x + 11, it.y - 11); c.lineTo(it.x - 11, it.y + 11); c.stroke();
+    } else if (it.type === "flecha"){
+      c.translate(it.x, it.y); c.rotate(it.ang);
+      c.beginPath(); c.moveTo(14, 0); c.lineTo(-10, -11); c.lineTo(-10, 11); c.closePath(); c.fill();
+    }
+    c.restore();
+  });
+}
+const HOJA = { items: [] };
+(function(){
+  const cont = $("hojaVeh");
+  const w = document.createElement("div"); w.className = "vw";
+  w.innerHTML = `<h5>VISTA SUPERIOR DEL VEHÍCULO</h5><canvas width="${CW}" height="${CH}" style="aspect-ratio:${CW}/${CH}"></canvas><div class="mini"><button type="button" data-u>↩ Deshacer</button><button type="button" data-c>🗑 Limpiar</button></div>`;
+  const cv = w.querySelector("canvas"), ctx = cv.getContext("2d");
+  const render = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, CW, CH); vehiculo(ctx); dibujarItems(ctx, HOJA.items); };
+  HOJA.render = render; render();
+  let dib = false, actual = null;
+  const pos = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * CW / r.width, y: (e.clientY - r.top) * CH / r.height }; };
+  cv.addEventListener("pointerdown", e => {
+    e.preventDefault(); cv.setPointerCapture(e.pointerId);
+    const p = pos(e), color = $("color").value;
+    if (tool === "x"){ HOJA.items.push({ type: "x", x: p.x, y: p.y, color }); render(); return; }
+    if (tool === "flecha"){
+      let ang = -Math.PI / 2;
+      const last = [...HOJA.items].reverse().find(i => i.type === "stroke");
+      if (last){ const e2 = last.pts[last.pts.length - 1]; for (let k = last.pts.length - 2; k >= 0; k--){ const q = last.pts[k]; if (Math.hypot(e2.x - q.x, e2.y - q.y) >= 8){ ang = Math.atan2(e2.y - q.y, e2.x - q.x); break; } } }
+      HOJA.items.push({ type: "flecha", x: p.x, y: p.y, ang, color }); render(); return;
+    }
+    dib = true; actual = { type: "stroke", color, size: +$("grosor").value, pts: [p] }; HOJA.items.push(actual); render();
+  });
+  cv.addEventListener("pointermove", e => { if (!dib) return; actual.pts.push(pos(e)); render(); });
+  ["pointerup", "pointercancel", "pointerleave"].forEach(ev => cv.addEventListener(ev, () => { dib = false; actual = null; }));
+  w.querySelector("[data-u]").onclick = () => { HOJA.items.pop(); render(); };
+  w.querySelector("[data-c]").onclick = () => { if (!HOJA.items.length || confirm("¿Borrar el trazo?")){ HOJA.items.length = 0; render(); } };
+  cont.appendChild(w);
+  const tc = document.createElement("div"); tc.className = "tchk"; tc.style.gridTemplateColumns = "1fr";
+  tc.innerHTML = `<div class="hint"><b>Verificación del trazo.</b> Determina el criterio B4 (T1–T5).</div>` + TS.map((t, i) => `
+    <div class="t"><b>T${i + 1}</b><span>${esc(t)}</span>
+      <div class="rd"><label><input type="radio" name="vT${i}" value="1"> Cumple</label><label><input type="radio" name="vT${i}" value="0"> No cumple</label></div></div>`).join("");
+  tc.querySelectorAll("input").forEach(inp => inp.onchange = () => { T_VEH[+inp.name.slice(2)] = inp.value === "1"; refrescar(); });
+  cont.appendChild(tc);
+})();
+
+function exportarVehiculo(titulo, sub){
+  const S = 2, HH = 78, off = document.createElement("canvas");
+  off.width = CW * S; off.height = (CH + HH + 16) * S;
+  const c = off.getContext("2d"); c.scale(S, S);
+  c.fillStyle = "#fff"; c.fillRect(0, 0, CW, CH + HH + 16);
+  c.fillStyle = "#0b3a6e"; c.fillRect(0, 0, CW, HH);
+  c.fillStyle = "#fff"; c.textAlign = "left"; c.textBaseline = "middle";
+  c.font = "bold 18px system-ui,Arial"; c.fillText(titulo, 12, 24);
+  c.font = "11px system-ui,Arial"; c.fillText(sub.slice(0, 80), 12, 48); if (sub.length > 80) c.fillText(sub.slice(80, 160), 12, 64);
+  c.textBaseline = "alphabetic";
+  c.save(); c.translate(0, HH + 16); vehiculo(c); dibujarItems(c, HOJA.items); c.strokeStyle = "#d5dce6"; c.lineWidth = 2; c.strokeRect(0, 0, CW, CH); c.restore();
+  return off.toDataURL("image/png").split(",")[1];
+}
+function lineas(c, texto, maxW){
+  const out = []; let l = "";
+  texto.split(" ").forEach(w => { const t = l ? l + " " + w : w; if (c.measureText(t).width > maxW && l){ out.push(l); l = w; } else l = t; });
+  if (l) out.push(l); return out;
+}
+function exportarRadio(titulo, sub){
+  const c6 = CRIT.find(c => c.id === "C6"), s = ST.C6, W = 900, off = document.createElement("canvas");
+  off.width = W; off.height = 1100;
+  const c = off.getContext("2d");
+  c.fillStyle = "#fff"; c.fillRect(0, 0, W, 1100);
+  c.fillStyle = "#0b3a6e"; c.fillRect(0, 0, W, 78);
+  c.fillStyle = "#fff"; c.textAlign = "left"; c.textBaseline = "middle";
+  c.font = "bold 26px system-ui,Arial"; c.fillText(titulo, 20, 28);
+  c.font = "17px system-ui,Arial"; c.fillText(sub.slice(0, 100), 20, 58);
+  c.textBaseline = "alphabetic"; let y = 118;
+  [0, 1].forEach(g => {
+    const idx = +$("sit" + g).value - 1;
+    c.fillStyle = "#0b3a6e"; c.font = "bold 22px system-ui,Arial"; c.fillText(`Situación ${g + 1} (N° ${idx + 1} del Anexo C)`, 20, y); y += 10;
+    c.fillStyle = "#1d2733"; c.font = "18px system-ui,Arial";
+    lineas(c, SIT[idx], W - 40).forEach(l => { y += 26; c.fillText(l, 20, y); });
+    y += 12;
+    c6.els.forEach((t, i) => {
+      const ok = s.els[g * 6 + i];
+      c.fillStyle = !s.touched ? "#5b6675" : ok ? "#1b8a4b" : "#c0392b";
+      c.font = "bold 18px system-ui,Arial"; c.fillText(!s.touched ? "–" : ok ? "✔" : "✘", 28, y + 26);
+      c.fillStyle = "#1d2733"; c.font = "17px system-ui,Arial";
+      lineas(c, t, W - 90).forEach((l, k) => { y += 24; c.fillText(l, 60, y); });
+      y += 4;
+    });
+    y += 28;
+  });
+  c.fillStyle = "#5b6675"; c.font = "15px system-ui,Arial";
+  c.fillText("El nivel del criterio C6 resulta del promedio de elementos cumplidos en las dos situaciones (redondeo hacia abajo).", 20, y + 10);
+  const out = document.createElement("canvas"); out.width = W; out.height = Math.min(1100, y + 40);
+  out.getContext("2d").drawImage(off, 0, 0);
+  return out.toDataURL("image/png").split(",")[1];
+}
+
+/* ===================== ENVÍO ===================== */
+const estado = $("estado");
+const msg = (t, x) => { estado.className = t; estado.textContent = x; };
+const marca = v => v === true ? "cumple" : v === false ? "no cumple" : "sin marcar";
+const tTexto = arr => TS.map((t, i) => `T${i + 1} ${t}: ${marca(arr[i])}`).join("\n");
+
+function tablaHtml(ap){
+  const colores = {4:"#1b8a4b", 3:"#6aa84f", 2:"#e69f00", 1:"#c0392b"};
+  let h = `<table cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:13px;font-family:Arial,Helvetica,sans-serif"><tr style="background:#0b3a6e;color:#fff"><th align="left">Criterio</th><th>Nivel</th><th align="left">Categoría</th></tr>`;
+  let sec = "";
+  ap.forEach(c => {
+    if (c.sec !== sec){ sec = c.sec; h += `<tr><td colspan="3" style="background:#e8f0fb;color:#0b3a6e;font-weight:bold">${esc(SECS[sec])}</td></tr>`; }
+    const l = ST[c.id].lvl;
+    h += `<tr style="border-bottom:1px solid #d5dce6"><td>${c.id} · ${esc(c.nom)}${c.k ? " ★" : ""}</td><td align="center" style="background:${colores[l]};color:#fff;font-weight:bold">${l}</td><td>${NIVELES[l]}</td></tr>`;
+  });
+  return h + "</table>";
+}
+function detalle(c){
+  const s = ST[c.id], l = s.lvl; let t = `${c.id} · ${c.nom}${c.k ? " [CRÍTICO]" : ""} → Nivel ${l} (${NIVELES[l]})`;
+  if (c.c6 && s.touched){
+    [0, 1].forEach(g => { const no = c.els.filter((_, i) => !s.els[g * 6 + i]).map(x => x.split(" ")[0]); if (no.length) t += `. Situación ${g + 1} (N° ${$("sit" + g).value}): elementos no cumplidos ${no.join(", ")}`; });
+  } else if (c.pct && s.touched){
+    const no = c.els.filter((_, i) => !s.ns[i] && !s.els[i]).map(x => x.split(" ")[0]); if (no.length) t += `. Elementos no cumplidos: ${no.join(", ")}`;
+  } else if (c.els && s.touched){
+    const no = c.els.filter((_, i) => !s.els[i]).map(x => x.split(" ")[0]); if (no.length) t += `. Elementos no cumplidos: ${no.join(", ")}`;
+  }
+  if (c.tIdx){ const no = c.tIdx.filter(i => T_VEH[i] !== true); if (no.length && c.tIdx.some(i => T_VEH[i] !== null)) t += `. Trazo no cumplido: ${no.map(i => "T" + (i + 1) + " (" + TS[i] + ")").join("; ")}`; }
+  return t;
+}
+
+$("btnEnviar").addEventListener("click", async () => {
+  const filas = [...integEl.children].map(r => ({ nombre: r.querySelector(".nom").value.trim(), mail: r.querySelector(".mail").value.trim(), rol: r.querySelector(".rol").value.trim() }));
+  const grupo = $("grupo").value.trim(), fh = $("fechaHora").value;
+  if (!grupo) return msg("err", "Ingresa la sección / grupo N°.");
+  if (filas.some(f => !f.nombre)) return msg("err", "Completa el nombre de todos los integrantes.");
+  if (filas.some(f => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.mail))) return msg("err", "Ingresa un correo válido para cada integrante.");
+  if (!motivo()) return msg("err", "Marca la modalidad del control.");
+  if (!$("alerta").value) return msg("err", "Selecciona el estado de alerta.");
+  const ap = aplicables(), faltan = ap.filter(c => !ST[c.id].lvl);
+  if (faltan.length) return msg("err", "Faltan criterios por puntuar: " + faltan.map(c => c.id).join(", "));
+  if (CONFIG.WEBHOOK_URL.includes("PEGA_AQUI")) return msg("err", "Falta configurar WEBHOOK_URL en el código.");
+  if (!HOJA.items.length && !confirm("No hay dibujo en el croquis del vehículo. ¿Enviar de todas formas?")) return;
+
+  const r = calcular(), nota = +notaChilena(r.pct).toFixed(1);
+  const fort = ap.filter(c => ST[c.id].lvl >= 3), mej = ap.filter(c => ST[c.id].lvl <= 2);
+  const gslug = slug(grupo), fdia = fh.slice(0, 10);
+  const subt = `${grupo} · ${fh.replace("T", " ")} · Modalidad: ${motivo()} · Alerta: ${$("alerta").value}`;
+  const mec = getRadio("mec") + (getRadio("mec") === "Otro" && $("mecOtro").value ? ": " + $("mecOtro").value : "");
+  const tipo = getRadio("pax") + (getRadio("pax") === "Otro" && $("paxEsp").value ? ": " + $("paxEsp").value : "");
+  const areas = [...document.querySelectorAll("#areas input:checked")].map(i => i.value).join("; ") || "(no registradas)";
+  const sit1 = SIT[+$("sit0").value - 1], sit2 = SIT[+$("sit1").value - 1];
+
+  const payload = {
+    token: CONFIG.TOKEN, asignatura: CONFIG.ASIGNATURA, titulo_evaluacion: CONFIG.TITULO, unidad: $("unidad").value, lugar: $("lugar").value,
+    fecha_hora: fh.replace("T", " "), grupo, evaluador: $("evaluador").value.trim(),
+    n_integrantes: filas.length,
+    integrantes_texto: filas.map((f, i) => `${i + 1}. ${f.nombre}${f.rol ? " — " + f.rol : ""}`).join("\n"),
+    integrantes_html: "<ol style='margin:0;padding-left:18px'>" + filas.map(f => `<li>${esc(f.nombre)}${f.rol ? " — <i>" + esc(f.rol) + "</i>" : ""}</li>`).join("") + "</ol>",
+    emails_destinatarios: filas.map(f => f.mail).join(","),
+    destinatarios: filas.map(f => f.mail),
+    escenario_mecanismo: mec, escenario_motivo: motivo(), estado_alerta: $("alerta").value, escenario_pasajero: "Tipo de vehículo: " + tipo,
+    elemento_persona: $("elPersona").value.trim(), elemento_equipaje: ($("elEquipaje").value.trim() + " · Áreas seleccionadas: " + areas).trim(),
+    detector_aplica: "no",
+    puntaje_obtenido: r.pts, puntaje_maximo: r.max, porcentaje: Math.round(r.pct * 10) / 10, nota, exigencia: CONFIG.EXIGENCIA,
+    n_criterios: r.n,
+    criticos_nivel1: r.crit.map(c => `${c.id} ${c.nom}`).join("; ") || "ninguno",
+    criterios_fortalezas: fort.map(detalle).join("\n") || "(ninguno)",
+    criterios_mejora: mej.map(detalle).join("\n") || "(ninguno)",
+    criterios_detalle: ap.map(detalle).join("\n"),
+    criterios_no_aplican: "ninguno",
+    tabla_html: tablaHtml(ap),
+    trazado_patdown_texto: "Croquis del vehículo (parte inferior):\n" + tTexto(T_VEH),
+    trazado_detector_texto: `Situaciones radiales: 1) ${sit1} 2) ${sit2}`,
+    docente_fortalezas: $("fort").value.trim(), docente_mejora: $("mejora").value.trim(), docente_compromisos: $("comp").value.trim(),
+    trazo_patdown_nombre: `croquis_vehiculo_${gslug}_${fdia}.png`,
+    trazo_patdown_base64: exportarVehiculo("Croquis de trazado · PARTE INFERIOR DEL VEHÍCULO", subt),
+    trazo_detector_nombre: `situaciones_radiales_${gslug}_${fdia}.png`,
+    trazo_detector_base64: exportarRadio("Situaciones radiales · Criterio C6", subt)
+  };
+
+  const btn = $("btnEnviar"); btn.disabled = true; msg("info", "Enviando evaluación…");
+  const opts = { method: "POST", body: JSON.stringify(payload) };
+  try {
+    const res = await fetch(CONFIG.WEBHOOK_URL, { ...opts, headers: { "Content-Type": "application/json" } });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    msg("ok", "✅ Evaluación enviada. Los integrantes recibirán el resultado y la retroalimentación por correo en unos instantes.");
+  } catch (err) {
+    try {
+      await fetch(CONFIG.WEBHOOK_URL, { ...opts, mode: "no-cors", headers: { "Content-Type": "text/plain" } });
+      msg("ok", "✅ Evaluación enviada (sin confirmación del servidor). Verifica en Make → History que el escenario se ejecutó.");
+    } catch (e2) { msg("err", "❌ No se pudo enviar: " + e2.message); }
+  } finally { btn.disabled = false; }
+});
+
+refrescar();
+</script>
+</body>
+</html>
