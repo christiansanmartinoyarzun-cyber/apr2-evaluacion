@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluación N° 3 · MEP, objetos prohibidos y Acta · APR 2</title>
+<style>
+  :root{
+    --azul:#0b3a6e; --azul2:#1456a0; --celeste:#e8f0fb; --ok:#1b8a4b; --mal:#c0392b;
+    --gris:#5b6675; --borde:#d5dce6; --fondo:#f4f6fa;
+    --n4:#1b8a4b; --n3:#6aa84f; --n2:#e69f00; --n1:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:#1d2733}
+  header{background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;padding:18px 16px}
+  header h1{margin:0;font-size:1.2rem}
+  header p{margin:4px 0 0;font-size:.82rem;opacity:.85}
+  main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
+  .card{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .card h2{margin:0 0 12px;font-size:1.05rem;color:var(--azul)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--gris);gap:4px}
+  input[type=text],input[type=email],input[type=datetime-local],select,textarea{
+    padding:9px;border:1px solid var(--borde);border-radius:8px;font:inherit;color:#1d2733;background:#fff;width:100%}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--azul2);border-color:transparent}
+  textarea{min-height:70px;resize:vertical}
+  .hint{font-size:.78rem;color:var(--gris)}
+  button{font:inherit;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:7px 11px;cursor:pointer}
+  button:hover{background:var(--celeste)}
+  button.act{background:var(--azul);color:#fff;border-color:var(--azul)}
+  button.primary{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:600;padding:12px 22px;font-size:1rem}
+  button.primary:disabled{opacity:.55;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .score{position:sticky;top:0;z-index:20;background:#fff;border:1px solid var(--borde);border-radius:12px;padding:10px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .score b{font-size:1.25rem;color:var(--azul)}
+  .score small{display:block;color:var(--gris);font-size:.7rem}
+  .bar{flex:1;min-width:120px;height:10px;background:#e3e8ef;border-radius:6px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .2s}
+  #alertaCritica{display:none;background:#fdeeee;border:1px solid #f1c3be;color:var(--mal);padding:10px 14px;border-radius:10px;font-size:.85rem;font-weight:600}
+  /* integrantes */
+  .integ{display:grid;grid-template-columns:28px 1.3fr 1.3fr 1fr 34px;gap:8px;align-items:center;margin-bottom:8px}
+  .integ span.n{font-weight:700;color:var(--azul);text-align:center}
+  @media(max-width:700px){.integ{grid-template-columns:24px 1fr 34px}.integ .c2,.integ .c3{grid-column:2/3}}
+  /* escenario */
+  .opt{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem}
+  .opt label{display:flex;gap:6px;align-items:center;cursor:pointer}
+  .opt input{accent-color:var(--azul2)}
+  .esc{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .esc .b{border:1px solid var(--borde);border-radius:10px;padding:10px}
+  .esc .b h4{margin:0 0 6px;font-size:.82rem;color:var(--azul)}
+  /* trazado */
+  .tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .views{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .vw{text-align:center}
+  .vw h5{margin:0 0 4px;font-size:.78rem;color:var(--azul)}
+  .vw canvas{width:100%;aspect-ratio:460/560;border:2px solid var(--azul);border-radius:10px;background:#fff;touch-action:none;cursor:crosshair}
+  .vw .mini{display:flex;gap:6px;justify-content:center;margin-top:4px}
+  .vw .mini button{padding:3px 9px;font-size:.78rem}
+  .tchk{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:4px 16px;margin-top:12px}
+  .tchk .t{display:flex;gap:8px;align-items:center;font-size:.85rem;padding:5px 6px;border-bottom:1px dashed var(--borde)}
+  .tchk .t b{min-width:26px;color:var(--azul)}
+  .tchk .t span{flex:1}
+  .tchk .rd{display:flex;gap:10px;font-size:.78rem}
+  .tchk .rd label{display:flex;gap:3px;align-items:center;cursor:pointer}
+  .na{padding:14px;background:#f1f3f7;border-radius:8px;color:var(--gris);font-size:.9rem}
+  /* rúbrica */
+  .sec h3{margin:18px 0 6px;font-size:.95rem;background:var(--celeste);color:var(--azul);padding:7px 10px;border-radius:6px}
+  .cr{border:1px solid var(--borde);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  .cr.hid{display:none}
+  .cr.crit{border-left:4px solid var(--n1)}
+  .cr .top{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .cr .nom{flex:1;min-width:220px;font-size:.92rem;font-weight:600}
+  .cr .nom em{font-style:normal;font-weight:400;color:var(--gris);font-size:.74rem;display:block}
+  .tag{font-size:.68rem;padding:2px 7px;border-radius:10px;background:#e3e8ef;color:var(--azul);font-weight:700}
+  .tag.k{background:#fdeeee;color:var(--mal)}
+  .lv{display:flex;gap:6px}
+  .lv button{width:42px;height:38px;font-weight:700;font-size:1rem;border-width:2px}
+  .lv button[data-l="4"]{border-color:var(--n4);color:var(--n4)}
+  .lv button[data-l="3"]{border-color:var(--n3);color:var(--n3)}
+  .lv button[data-l="2"]{border-color:var(--n2);color:var(--n2)}
+  .lv button[data-l="1"]{border-color:var(--n1);color:var(--n1)}
+  .lv button.sel[data-l="4"]{background:var(--n4);color:#fff}
+  .lv button.sel[data-l="3"]{background:var(--n3);color:#fff}
+  .lv button.sel[data-l="2"]{background:var(--n2);color:#fff}
+  .lv button.sel[data-l="1"]{background:var(--n1);color:#fff}
+  .cur{font-size:.84rem;margin:8px 0 0;padding:8px 10px;background:#f8f9fc;border-radius:8px;min-height:20px}
+  .cur b{color:var(--azul)}
+  details.all{margin-top:6px;font-size:.78rem}
+  details.all summary{cursor:pointer;color:var(--azul2)}
+  .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin-top:6px}
+  .dgrid div{padding:8px;border-radius:8px;border:1px solid var(--borde)}
+  .dgrid div.on{outline:2px solid var(--azul2);background:var(--celeste)}
+  .dgrid div b{display:block;margin-bottom:2px}
+  .els{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px 14px;margin-top:8px}
+  .els label{display:flex;gap:8px;font-size:.84rem;align-items:flex-start;padding:3px 0;cursor:pointer}
+  .els input{width:18px;height:18px;accent-color:var(--ok);flex:none;margin-top:1px}
+  .sug{font-size:.78rem;color:var(--gris);margin-top:6px}
+  .sug a{color:var(--azul2);cursor:pointer;text-decoration:underline}
+  #estado{padding:12px;border-radius:8px;font-size:.9rem;display:none;white-space:pre-line}
+  #estado.ok{display:block;background:#eefaf3;color:var(--ok);border:1px solid #bfe5cd}
+  #estado.err{display:block;background:#fdeeee;color:var(--mal);border:1px solid #f1c3be}
+  #estado.info{display:block;background:var(--celeste);color:var(--azul);border:1px solid #c5d6ee}
+  input[type=color]{width:38px;height:34px;padding:2px;border:1px solid var(--borde);border-radius:8px;background:#fff}
+  .els input[type=checkbox]{accent-color:var(--ok)}
+  .vw canvas{max-width:420px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Instrumento de Evaluación N° 3 · Escala de apreciación (4 niveles)</h1>
+  <p>Tratamiento de MEP y de objetos prohibidos y retenidos, con llenado del Acta de Entrega de Mercancías Peligrosas al Explotador · Apresto al Entrenamiento en Terreno (APR) 2026 · ETA-DGAC</p>
+</header>
+
+<main>
+  <div class="score" aria-live="polite">
+    <div><b id="sPuntos">0 / 0</b><small>Puntaje del grupo</small></div>
+    <div><b id="sPct">0%</b><small>Logro</small></div>
+    <div><b id="sNota">1,0</b><small>Nota (exigencia <span id="sExig"></span>%)</small></div>
+    <div><b id="sProg">0/0</b><small>Criterios puntuados</small></div>
+    <div class="bar"><i id="sBar"></i></div>
+  </div>
+  <div id="alertaCritica"></div>
+
+  <section class="card">
+    <h2>I. Datos de la evaluación e integrantes del grupo</h2>
+    <div class="grid">
+      <label class="f">Carrera<input type="text" value="Técnico de Nivel Superior en Seguridad Aeroportuaria" readonly></label>
+      <label class="f">Módulo<input type="text" value="Apresto al Entrenamiento en Terreno (APR) – 2026, 2.º semestre" readonly></label>
+      <label class="f">Unidad<input type="text" id="unidad" value="A - Operación de equipos de seguridad en PCS (MEP, objetos prohibidos y retenidos; formularios)"></label>
+      <label class="f">Lugar / puesto<input type="text" id="lugar" value="PCS de entrenamiento (simulador) / sala de revisión"></label>
+      <label class="f">Fecha y hora<input type="datetime-local" id="fechaHora"></label>
+      <label class="f">Sección / grupo N° *<input type="text" id="grupo" placeholder="Ej: Sección 1 · Grupo 3"></label>
+      <label class="f">Docente evaluador<input type="text" id="evaluador" value="Christian San Martín Oyarzún"></label>
+    </div>
+    <h4 style="margin:16px 0 6px;color:var(--azul);font-size:.9rem">Integrantes del grupo (3 a 4 estudiantes) *</h4>
+    <div id="integrantes"></div>
+    <button type="button" id="btnAddInt">+ Agregar integrante</button>
+  </section>
+
+  <section class="card">
+    <h2>III. Condiciones del escenario <span class="hint">(marcar antes de iniciar)</span></h2>
+    <div class="esc">
+      <div class="b"><h4>Mecanismo de definición</h4>
+        <div class="opt">
+          <label><input type="radio" name="mec" value="Definido por el docente" checked> Definido por el docente</label>
+          <label><input type="radio" name="mec" value="Sorteado (dado)"> Sorteado (dado)</label>
+          <label><input type="radio" name="mec" value="Sorteado (fichas)"> Sorteado (fichas)</label>
+          <label><input type="radio" name="mec" value="Otro"> Otro</label>
+        </div>
+        <input type="text" id="mecOtro" placeholder="Si es otro, especifica" style="margin-top:6px">
+      </div>
+      <div class="b"><h4>Origen del hallazgo *</h4>
+        <div class="opt" style="flex-direction:column;gap:6px">
+          <label><input type="radio" name="origen" value="Equipaje de mano (rayos X)"> Equipaje de mano (rayos X)</label>
+          <label><input type="radio" name="origen" value="Registro manual de la persona"> Registro manual de la persona</label>
+          <label><input type="radio" name="origen" value="Equipaje de bodega"> Equipaje de bodega</label>
+          <label><input type="radio" name="origen" value="Tripulante"> Tripulante</label>
+        </div>
+        <h4 style="margin-top:10px">Motivo de la revisión *</h4>
+        <div class="opt" style="flex-direction:column;gap:6px">
+          <label><input type="radio" name="motivo" value="ALEATORIO e imprevisible"> ALEATORIO e imprevisible</label>
+          <label><input type="radio" name="motivo" value="ALARMA de pórtico / detector manual"> ALARMA de pórtico / detector manual</label>
+          <label><input type="radio" name="motivo" value="ALARMA de rayos X"> ALARMA de rayos X</label>
+        </div>
+      </div>
+      <div class="b"><h4>Artículos del escenario</h4>
+        <label class="f">Prohibido<input type="text" id="artProh"></label>
+        <label class="f" style="margin-top:6px">Retenido<input type="text" id="artRet"></label>
+        <label class="f" style="margin-top:6px">MEP<input type="text" id="artMep"></label>
+      </div>
+      <div class="b"><h4>Alternativa aplicable a la MEP (PRO-17 00)</h4>
+        <div class="opt" style="flex-direction:column;gap:6px">
+          <label><input type="radio" name="alt" value="1. Transporte conforme a las Instrucciones Técnicas (vía operador aéreo)"> 1. Transporte conforme a las Instrucciones Técnicas (vía operador aéreo)</label>
+          <label><input type="radio" name="alt" value="2. Entrega a familiar o conocido en la parte pública"> 2. Entrega a familiar o conocido en la parte pública</label>
+          <label><input type="radio" name="alt" value="3. Entrega documentada al explotador para su eliminación (con Acta)"> 3. Entrega documentada al explotador para su eliminación (con Acta)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>V. Verificación de los campos del Acta <span class="hint">(Anexo A · DAN 18, Anexo B · ✓ = correcto, legible y coherente con la ficha del escenario)</span></h2>
+    <p class="hint" style="margin-top:-6px">El Acta se completa aunque la alternativa del escenario sea otra, porque se evalúa el dominio del formulario (AE 11). El conteo determina los indicadores C3, C4 y C5 (se sugiere el nivel y puedes corregirlo). Se envía como adjunto 1.</p>
+    <div id="acta" class="tchk" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))"></div>
+    <div id="actaTot" class="hint" style="margin-top:8px"></div>
+  </section>
+
+  <section class="card">
+    <h2>VI. Escala de apreciación <span class="hint">(puntaje del grupo: 4 · 3 · 2 · 1)</span></h2>
+    <p class="hint" style="margin-top:-6px">Cuenta los elementos (E1, E2…) cumplidos sin ayuda: 4 de 4 = nivel 4; 3 = nivel 3; 2 = nivel 2; 0 o 1 = nivel 1, o error crítico. Criterios ★ críticos: A2 (aislamiento del artículo alertado) y C1 (decisión sobre la MEP). B2 y B3 del Word se evalúan por aplicación o verbalización.</p>
+    <div id="rubrica"></div>
+  </section>
+
+  <section class="card">
+    <h2>VII. Retroalimentación del evaluador</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+      <label class="f">Fortalezas observadas<textarea id="fort"></textarea></label>
+      <label class="f">Aspectos para mejorar / retroalimentación<textarea id="mejora"></textarea></label>
+      <label class="f">Compromisos de mejora<textarea id="comp"></textarea></label>
+    </div>
+    <p class="hint">Estas observaciones se entregan a la IA como insumo y se incluyen en el correo.</p>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <button type="button" id="btnEnviar" class="primary">📨 Enviar evaluación al grupo</button>
+      <span class="hint">Se envía a todos los integrantes, con copia al docente evaluador.</span>
+    </div>
+    <div id="estado" style="margin-top:12px"></div>
+  </section>
+</main>
+
+<script>
+/* ===================== CONFIGURACIÓN ===================== */
+const CONFIG = {
+  WEBHOOK_URL: "https://hook.us2.make.com/seqld9v9skpkm0v3vydvc9pgc4af08g9",
+  TOKEN: "apr2c-281bffd25ba956753c6d306a",
+  EXIGENCIA: 60,
+  ASIGNATURA: "Apresto al Entrenamiento en Terreno (APR) 2026 · Evaluación N° 3",
+  TITULO: "Evaluación N° 3 · Mercancías peligrosas, objetos prohibidos y Acta de entrega"
+};
+
+const NIVELES = {4:"Logrado destacado", 3:"Logrado", 2:"Parcialmente logrado", 1:"No logrado"};
+const SECS = {
+  A: "A. DETECCIÓN, AISLAMIENTO Y CLASIFICACIÓN DEL ARTÍCULO – PRO-17 00, 8.20 y 8.21",
+  B: "B. TRATAMIENTO DEL OBJETO PROHIBIDO Y DEL OBJETO RETENIDO – PRO-17 00, 8.21.2 y 8.21.3",
+  C: "C. TRATAMIENTO DE LA MEP Y LLENADO DEL ACTA DE ENTREGA (DAN 18, Anexo B)"
+};
+/* campos del Acta (Anexo A del instrumento) */
+const ACTA = ["Unidad aeroportuaria (nombre del aeropuerto)","Fecha","Hora","Folio N°","Nombre del pasajero","C. de identidad N° o Pasaporte N°","Explotador de aeronaves","Vuelo número","Destino","Teléfono de contacto","Nombre Func. AVSEC que detectó MEP","Detalle de la mercancía (descripción completa)","Nota de responsabilidad informada al pasajero","Firma del pasajero","Firma del funcionario AVSEC","Ítem II – Fecha del retiro","Ítem II – Hora","Nombre del representante del explotador de aeronaves","Nombre del funcionario AVSEC que entrega","Firma del representante del explotador","Firma del funcionario AVSEC que entrega","Copia N° 1 – Pasajero","Copia N° 2 – Explotador de aeronaves","Copia N° 3 – AVSEC","Letra legible, sin enmendaduras (buena práctica)","Espacios sobrantes anulados (buena práctica)"];
+const ACTA_IND = ["C3","C3","C3","C3","C4","C4","C4","C4","C4","C4","C4","C5","C5","C5","C5","C5","C5","C5","C5","C5","C5","C5","C5","C5","C5","C5"];
+
+const rg = (lo, hi) => lo === hi ? `${lo}` : `${lo} a ${hi}`;
+function lv4(items, crit){
+  return { els: items.map((t, i) => `E${i + 1} ${t}`), d: [
+    "Cumple los 4 elementos observables (E1 a E4), sin ayuda del evaluador.",
+    "Cumple 3 de 4 elementos, sin ayuda. Las omisiones son menores y no comprometen la seguridad.",
+    "Cumple 2 de 4 elementos, o requiere recordatorios del evaluador.",
+    "Cumple 0 a 1 de 4 elementos, o comete un error crítico" + (crit ? " (" + crit + ")" : "") + "."], crit };
+}
+function actaLv(items, eg){
+  return { els: items.map((t, i) => `E${i + 1} ${t}`), eg, d: [
+    "Cumple los 4 elementos del Acta correspondientes a este indicador, de forma correcta y legible.",
+    "Cumple 3 de 4 elementos.", "Cumple 2 de 4 elementos.", "Cumple 0 a 1 de 4 elementos."] };
+}
+const CRIT = [];
+function add(id, sec, t, nom, ref, lv, k){ CRIT.push(Object.assign({ id, sec, t, nom, ref, k: !!k }, lv)); }
+
+add("A1","A","C","Clasificación del artículo hallado y fundamento normativo","PRO-17 00",
+ lv4(["clasifica el artículo como inofensivo, prohibido, retenido, MEP o sospechoso","consulta los listados vigentes del DASA y las Instrucciones Técnicas aplicables","diferencia el tratamiento del objeto prohibido, el objeto retenido y la MEP no autorizada","fundamenta oralmente la clasificación y la decisión con la norma o el listado vigente"],"clasifica una MEP como inofensiva"));
+add("A2","A","H","Aislamiento del artículo alertado y descarte de la amenaza","PRO-17 00",
+ lv4(["impide el ingreso del artículo a la zona de seguridad restringida hasta identificarlo","utiliza los medios disponibles para descartar la amenaza","mantiene el artículo controlado, fuera del alcance del pasajero y lo manipula con guantes","si no descarta la amenaza, aplica el procedimiento ante IED, informa al encargado y controla el flujo"],"permite el paso del artículo alertado"), true);
+add("A3","A","A","Comunicación asertiva con el pasajero o tripulante","Programa Apresto (manejo de conflictos; AE 11); material de clase Unidad A",
+ lv4(["saluda, se identifica y explica claramente el motivo del procedimiento","informa las alternativas permitidas por la norma","mantiene un tono sereno y respetuoso, escucha y responde sin discutir","cierra la interacción sin prometer excepciones y agradece la cooperación"]));
+add("B1","B","H","Tratamiento del objeto prohibido: depósito en el receptáculo del PCS","PRO-17 00",
+ lv4(["informa que el objeto es prohibido y no puede transportarse en la persona ni en el equipaje de mano","deposita el objeto en el receptáculo del PCS y verifica que quede en condición segura","registra la novedad según el procedimiento local","revisa nuevamente a la persona o el equipaje para descartar otros elementos prohibidos"]));
+add("C1","C","C","Verificación normativa de la MEP y decisión de tratamiento","PRO-17 00, 8.21.4 a–c; DAN 18",
+ lv4(["reconoce la MEP y verifica las disposiciones de transporte para pasajeros o tripulación","comunica que no se autoriza el embarque cuando está prohibida o no cumple las disposiciones","identifica las tres alternativas de tratamiento establecidas en 8.21.4 b","decide y fundamenta la alternativa pertinente al escenario"],"autoriza el embarque de una MEP que no cumple"), true);
+add("C2","C","H","Contacto con el operador aéreo y gestión de la alternativa","PRO-17 00, 8.21.4 b",
+ lv4(["contacta al tenedor de la especie con el representante del operador aéreo","coordina la alternativa aplicable: transporte conforme, entrega en la parte pública o entrega documentada para eliminación","explica al pasajero la responsabilidad asociada a la entrega para eliminación","verifica la conformidad del pasajero y ejecuta la alternativa seleccionada"]));
+add("C3","C","H","Acta – Encabezado (campos 1 a 4)","DAN 18, Anexo B (Acta de Entrega de MP al Explotador de Aeronaves)",
+ actaLv(["Unidad aeroportuaria (nombre del aeropuerto)","Fecha","Hora","Folio N°"], [[0],[1],[2],[3]]));
+add("C4","C","H","Acta – Ítem I: Constancia de recepción (campos 5 a 11)","DAN 18, Anexo B, Ítem I",
+ actaLv(["identificación del pasajero y su documento","explotador, vuelo y destino","teléfono de contacto","funcionario AVSEC que detectó la MEP"], [[4,5],[6,7,8],[9],[10]]));
+add("C5","C","H","Acta – Llenado completo, retiro, distribución y calidad (campos 12 a 26)","DAN 18, Anexo B, Ítems I y II",
+ actaLv(["detalle de la mercancía, nota de responsabilidad y firmas del pasajero y del funcionario AVSEC","constancia de retiro: fecha, hora, identificación y firmas de quienes entregan y reciben","distribución de copias: pasajero, explotador y archivo AVSEC","llenado legible, sin enmendaduras y espacios sobrantes anulados"], [[11,12,13,14],[15,16,17,18,19,20],[21,22,23],[24,25]]));
+
+/* ===================== UTILIDADES ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "");
+const getRadio = n => (document.querySelector(`input[name="${n}"]:checked`) || {}).value || "";
+
+/* integrantes */
+const integEl = $("integrantes");
+function addInt(){
+  if (integEl.children.length >= 4) return;
+  const row = document.createElement("div"); row.className = "integ";
+  row.innerHTML = `<span class="n"></span>
+    <input type="text" class="c1 nom" placeholder="Nombres y apellidos">
+    <input type="email" class="c2 mail" placeholder="correo@estudiante.cl">
+    <input type="text" class="c3 rol" placeholder="Rol(es) en el escenario">
+    <button type="button" title="Quitar">✕</button>`;
+  row.querySelector("button").onclick = () => { if (integEl.children.length > 3) { row.remove(); renum(); } };
+  integEl.appendChild(row); renum();
+}
+function renum(){ [...integEl.children].forEach((r, i) => r.querySelector(".n").textContent = i + 1); $("btnAddInt").style.display = integEl.children.length >= 4 ? "none" : ""; }
+$("btnAddInt").onclick = addInt; addInt(); addInt(); addInt();
+(function(){ const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $("fechaHora").value = d.toISOString().slice(0, 16); })();
+
+/* ===================== ESTADO ===================== */
+const ST = {}; CRIT.forEach(c => ST[c.id] = { lvl: null, manual: false, touched: false, err: false, els: Array(c.els.length).fill(false) });
+const ACTA_OK = Array(ACTA.length).fill(false); let actaTouched = false;
+const porConteo = n => n >= 4 ? 4 : n >= 3 ? 3 : n >= 2 ? 2 : 1;
+function nEls(c){ const s = ST[c.id]; return c.eg ? c.eg.filter(g => g.every(i => ACTA_OK[i])).length : s.els.filter(Boolean).length; }
+function sugerido(c){
+  const s = ST[c.id];
+  if (s.err) return 1;
+  if (c.eg) return actaTouched ? porConteo(nEls(c)) : null;
+  return s.touched ? porConteo(nEls(c)) : null;
+}
+function autoNivel(c){ const s = ST[c.id]; if (s.manual) return; const g = sugerido(c); if (g !== null) s.lvl = g; }
+
+/* ===================== RENDER ===================== */
+const rubEl = $("rubrica"), secBox = {}, crEl = {};
+Object.keys(SECS).forEach(k => { const d = document.createElement("div"); d.className = "sec"; d.innerHTML = `<h3>${esc(SECS[k])}</h3>`; rubEl.appendChild(d); secBox[k] = d; });
+CRIT.forEach(c => {
+  const el = document.createElement("div"); el.className = "cr" + (c.k ? " crit" : ""); crEl[c.id] = el;
+  const dom = {C:"Conocimientos", H:"Habilidades", A:"Actitudes"}[c.t];
+  let extra = "";
+  if (c.eg) extra = `<div class="sug" data-esum></div>`;
+  else extra = `<div class="els">${c.els.map((t, i) => `<label><input type="checkbox" data-k="e" data-i="${i}"><span>${esc(t)}</span></label>`).join("")}${c.crit ? `<label style="color:var(--mal)"><input type="checkbox" data-k="x"><span><b>Error crítico:</b> ${esc(c.crit)}</span></label>` : ""}</div>`;
+  el.innerHTML = `
+    <div class="top">
+      <div class="nom">${c.id} · ${esc(c.nom)}${c.k ? " ★" : ""}<em>${esc(c.ref)}</em></div>
+      <span class="tag">${dom}</span>${c.k ? '<span class="tag k">CRÍTICO</span>' : ""}
+      <div class="lv">${[4,3,2,1].map(n => `<button type="button" data-l="${n}" title="${NIVELES[n]}">${n}</button>`).join("")}</div>
+    </div>
+    ${extra}
+    <div class="sug" data-sug></div>
+    <div class="cur" data-cur>Selecciona un nivel.</div>
+    <details class="all"><summary>Ver descriptores de los 4 niveles</summary>
+      <div class="dgrid">${[4,3,2,1].map((n, i) => `<div data-n="${n}"><b>Nivel ${n} · ${NIVELES[n]}</b>${esc(c.d[i])}</div>`).join("")}</div>
+    </details>`;
+  el.querySelectorAll(".lv button").forEach(b => b.onclick = () => { ST[c.id].lvl = +b.dataset.l; ST[c.id].manual = true; refrescar(); });
+  el.querySelectorAll(".els input").forEach(cb => cb.onchange = () => {
+    const s = ST[c.id];
+    if (cb.dataset.k === "x") s.err = cb.checked; else s.els[+cb.dataset.i] = cb.checked;
+    s.touched = true; if (s.err) s.manual = false; autoNivel(c); refrescar();
+  });
+  secBox[c.sec].appendChild(el);
+});
+function pintarCriterio(c){
+  const el = crEl[c.id], s = ST[c.id];
+  el.querySelectorAll(".lv button").forEach(b => b.classList.toggle("sel", s.lvl === +b.dataset.l));
+  el.querySelector("[data-cur]").innerHTML = s.lvl ? `<b>Nivel ${s.lvl} · ${NIVELES[s.lvl]}:</b> ${esc(c.d[4 - s.lvl])}` : "Selecciona un nivel.";
+  el.querySelectorAll(".dgrid div").forEach(d => d.classList.toggle("on", +d.dataset.n === s.lvl));
+  const sug = el.querySelector("[data-sug]"), g = sugerido(c);
+  if (g !== null){
+    sug.innerHTML = `Nivel sugerido por el conteo: <b>${g}</b>` + (s.manual && s.lvl !== g ? ` · <a data-re>usar sugerido</a>` : "");
+    const a = sug.querySelector("[data-re]"); if (a) a.onclick = () => { s.manual = false; s.lvl = g; refrescar(); };
+  } else sug.textContent = "";
+  if (c.eg){
+    el.querySelector("[data-esum]").innerHTML = "Verificación en el Acta (sección V): " + c.els.map((t, i) => `<b>E${i + 1}</b> ${c.eg[i].every(k => ACTA_OK[k]) ? "✔" : "✘"}`).join(" · ") + ` · <b>${nEls(c)} de 4</b> cumplidos.`;
+  }
+}
+/* checklist del Acta */
+const actaEl = $("acta");
+ACTA.forEach((t, i) => {
+  const d = document.createElement("div"); d.className = "t";
+  d.innerHTML = `<b>${i + 1}</b><span>${esc(t)} <em style="color:var(--gris);font-size:.72rem">(${ACTA_IND[i]})</em></span><label style="display:flex;gap:4px;align-items:center;cursor:pointer"><input type="checkbox"> ✓</label>`;
+  d.querySelector("input").onchange = e => { ACTA_OK[i] = e.target.checked; actaTouched = true; refrescar(); };
+  actaEl.appendChild(d);
+});
+function calcular(){
+  const pts = CRIT.reduce((s, c) => s + (ST[c.id].lvl || 0), 0), done = CRIT.filter(c => ST[c.id].lvl).length, max = CRIT.length * 4, pct = max ? pts / max * 100 : 0;
+  $("sPuntos").textContent = `${pts} / ${max}`; $("sPct").textContent = `${pct.toFixed(0)}%`;
+  $("sNota").textContent = done === CRIT.length ? notaChilena(pct).toFixed(1).replace(".", ",") : "—";
+  $("sProg").textContent = `${done}/${CRIT.length}`; $("sBar").style.width = pct + "%";
+  const crit = CRIT.filter(c => c.k && ST[c.id].lvl === 1), al = $("alertaCritica");
+  if (crit.length){ al.style.display = "block"; al.textContent = `⚠ Criterio crítico en nivel 1 (${crit.map(c => c.id).join(", ")}): aplicar la regla del resumen según el reglamento de evaluación de la Escuela.`; } else al.style.display = "none";
+  return { pts, max, pct, done, n: CRIT.length, crit };
+}
+function notaChilena(pct){ const e = CONFIG.EXIGENCIA; return Math.max(1, Math.min(7, pct >= e ? 4 + 3 * (pct - e) / (100 - e) : 1 + 3 * pct / e)); }
+function actaTot(){ const t = k => ACTA_IND.map((x, i) => x === k && ACTA_OK[i]).filter(Boolean).length, n = k => ACTA_IND.filter(x => x === k).length; return `Campos correctos: C3 ${t("C3")}/${n("C3")} · C4 ${t("C4")}/${n("C4")} · C5 ${t("C5")}/${n("C5")} (total ${ACTA_OK.filter(Boolean).length}/26)`; }
+function refrescar(){ CRIT.forEach(autoNivel); CRIT.forEach(pintarCriterio); $("actaTot").textContent = actaTot(); calcular(); }
+$("sExig").textContent = CONFIG.EXIGENCIA;
+
+/* ===================== IMÁGENES ADJUNTAS ===================== */
+function lineas(c, texto, maxW){
+  const out = []; let l = "";
+  String(texto).split(" ").forEach(w => { const t = l ? l + " " + w : w; if (c.measureText(t).width > maxW && l){ out.push(l); l = w; } else l = t; });
+  if (l) out.push(l); return out;
+}
+function lienzo(titulo, sub, alto){
+  const W = 900, off = document.createElement("canvas"); off.width = W; off.height = alto;
+  const c = off.getContext("2d"); c.fillStyle = "#fff"; c.fillRect(0, 0, W, alto);
+  c.fillStyle = "#0b3a6e"; c.fillRect(0, 0, W, 78); c.fillStyle = "#fff"; c.textAlign = "left"; c.textBaseline = "middle";
+  c.font = "bold 26px system-ui,Arial"; c.fillText(titulo, 20, 28); c.font = "17px system-ui,Arial"; c.fillText(sub.slice(0, 100), 20, 58);
+  c.textBaseline = "alphabetic"; return { off, c, W };
+}
+function recortar(off, y){ const o = document.createElement("canvas"); o.width = off.width; o.height = Math.min(off.height, y + 30); o.getContext("2d").drawImage(off, 0, 0); return o.toDataURL("image/png").split(",")[1]; }
+function exportarActa(titulo, sub){
+  const { off, c, W } = lienzo(titulo, sub, 1500); let y = 110;
+  c.font = "bold 20px system-ui,Arial"; c.fillStyle = "#0b3a6e"; c.fillText(actaTot(), 20, y); y += 12;
+  ACTA.forEach((t, i) => {
+    y += 36; c.fillStyle = ACTA_OK[i] ? "#1b8a4b" : "#c0392b"; c.font = "bold 22px system-ui,Arial"; c.fillText(ACTA_OK[i] ? "✔" : "✘", 24, y);
+    c.fillStyle = "#1d2733"; c.font = "18px system-ui,Arial"; c.fillText(`${i + 1}. ${t}`, 62, y);
+    c.fillStyle = "#5b6675"; c.font = "15px system-ui,Arial"; c.fillText(ACTA_IND[i], W - 60, y);
+  });
+  return recortar(off, y);
+}
+function exportarFicha(titulo, sub, esc3){
+  const { off, c, W } = lienzo(titulo, sub, 1500); let y = 112;
+  c.fillStyle = "#0b3a6e"; c.font = "bold 20px system-ui,Arial"; c.fillText("Condiciones del escenario", 20, y);
+  c.fillStyle = "#1d2733"; c.font = "17px system-ui,Arial";
+  esc3.forEach(t => lineas(c, t, W - 40).forEach(l => { y += 26; c.fillText(l, 20, y); }));
+  y += 34; c.fillStyle = "#0b3a6e"; c.font = "bold 20px system-ui,Arial"; c.fillText("Resultado por criterio", 20, y);
+  const col = {4:"#1b8a4b", 3:"#6aa84f", 2:"#e69f00", 1:"#c0392b"};
+  CRIT.forEach(cr => {
+    y += 36; const l = ST[cr.id].lvl;
+    c.fillStyle = col[l]; c.fillRect(20, y - 22, 34, 28); c.fillStyle = "#fff"; c.font = "bold 20px system-ui,Arial"; c.textAlign = "center"; c.fillText(l, 37, y); c.textAlign = "left";
+    c.fillStyle = "#1d2733"; c.font = "17px system-ui,Arial"; c.fillText(`${cr.id} · ${cr.nom}`.slice(0, 80) + (cr.k ? " ★" : ""), 66, y);
+  });
+  return recortar(off, y);
+}
+
+/* ===================== ENVÍO ===================== */
+const estado = $("estado"), msg = (t, x) => { estado.className = t; estado.textContent = x; };
+function tablaHtml(ap){
+  const colores = {4:"#1b8a4b", 3:"#6aa84f", 2:"#e69f00", 1:"#c0392b"};
+  let h = `<table cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:13px;font-family:Arial,Helvetica,sans-serif"><tr style="background:#0b3a6e;color:#fff"><th align="left">Criterio</th><th>Nivel</th><th align="left">Categoría</th></tr>`;
+  let sec = "";
+  ap.forEach(c => {
+    if (c.sec !== sec){ sec = c.sec; h += `<tr><td colspan="3" style="background:#e8f0fb;color:#0b3a6e;font-weight:bold">${esc(SECS[sec])}</td></tr>`; }
+    const l = ST[c.id].lvl;
+    h += `<tr style="border-bottom:1px solid #d5dce6"><td>${c.id} · ${esc(c.nom)}${c.k ? " ★" : ""}</td><td align="center" style="background:${colores[l]};color:#fff;font-weight:bold">${l}</td><td>${NIVELES[l]}</td></tr>`;
+  });
+  return h + "</table>";
+}
+function detalle(c){
+  const s = ST[c.id], l = s.lvl; let t = `${c.id} · ${c.nom}${c.k ? " [CRÍTICO]" : ""} → Nivel ${l} (${NIVELES[l]})`;
+  if (c.eg){ const no = c.eg.map((g, i) => g.every(k => ACTA_OK[k]) ? null : "E" + (i + 1)).filter(Boolean); if (actaTouched && no.length) t += `. Elementos del Acta no cumplidos: ${no.join(", ")}`; }
+  else if (s.touched){ const no = c.els.filter((_, i) => !s.els[i]).map(x => x.split(" ")[0]); if (no.length) t += `. Elementos no cumplidos: ${no.join(", ")}`; if (s.err) t += `. ERROR CRÍTICO: ${c.crit}`; }
+  return t;
+}
+$("btnEnviar").addEventListener("click", async () => {
+  const filas = [...integEl.children].map(r => ({ nombre: r.querySelector(".nom").value.trim(), mail: r.querySelector(".mail").value.trim(), rol: r.querySelector(".rol").value.trim() }));
+  const grupo = $("grupo").value.trim(), fh = $("fechaHora").value;
+  if (!grupo) return msg("err", "Ingresa la sección / grupo N°.");
+  if (filas.some(f => !f.nombre)) return msg("err", "Completa el nombre de todos los integrantes.");
+  if (filas.some(f => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.mail))) return msg("err", "Ingresa un correo válido para cada integrante.");
+  if (!getRadio("origen") || !getRadio("motivo")) return msg("err", "Marca el origen del hallazgo y el motivo de la revisión.");
+  const faltan = CRIT.filter(c => !ST[c.id].lvl);
+  if (faltan.length) return msg("err", "Faltan criterios por puntuar: " + faltan.map(c => c.id).join(", "));
+  if (!CONFIG.TOKEN) return msg("err", "Falta configurar TOKEN en el código.");
+  if (!actaTouched && !confirm("No marcaste ningún campo del Acta. ¿Enviar de todas formas?")) return;
+
+  const r = calcular(), nota = +notaChilena(r.pct).toFixed(1), ap = CRIT.slice();
+  const fort = ap.filter(c => ST[c.id].lvl >= 3), mej = ap.filter(c => ST[c.id].lvl <= 2);
+  const gslug = slug(grupo), fdia = fh.slice(0, 10), subt = `${grupo} · ${fh.replace("T", " ")} · Origen: ${getRadio("origen")}`;
+  const mec = getRadio("mec") + (getRadio("mec") === "Otro" && $("mecOtro").value ? ": " + $("mecOtro").value : "");
+  const arts = `Prohibido: ${$("artProh").value.trim() || "—"} · Retenido: ${$("artRet").value.trim() || "—"} · MEP: ${$("artMep").value.trim() || "—"}`;
+  const alt = getRadio("alt") || "(no registrada)";
+  const noOk = ACTA.filter((_, i) => !ACTA_OK[i]).map((t, k) => t);
+  const ficha = [`Mecanismo: ${mec}`, `Origen del hallazgo: ${getRadio("origen")}`, `Motivo de la revisión: ${getRadio("motivo")}`, arts, `Alternativa aplicable a la MEP: ${alt}`];
+  const payload = {
+    token: CONFIG.TOKEN, asignatura: CONFIG.ASIGNATURA, titulo_evaluacion: CONFIG.TITULO, unidad: $("unidad").value, lugar: $("lugar").value,
+    fecha_hora: fh.replace("T", " "), grupo, evaluador: $("evaluador").value.trim(), n_integrantes: filas.length,
+    integrantes_texto: filas.map((f, i) => `${i + 1}. ${f.nombre}${f.rol ? " — " + f.rol : ""}`).join("\n"),
+    integrantes_html: "<ol style='margin:0;padding-left:18px'>" + filas.map(f => `<li>${esc(f.nombre)}${f.rol ? " — <i>" + esc(f.rol) + "</i>" : ""}</li>`).join("") + "</ol>",
+    emails_destinatarios: filas.map(f => f.mail).join(","), destinatarios: filas.map(f => f.mail),
+    escenario_mecanismo: mec, escenario_motivo: getRadio("motivo"), estado_alerta: "no aplica", escenario_pasajero: "Origen del hallazgo: " + getRadio("origen"),
+    elemento_persona: arts, elemento_equipaje: "Alternativa aplicable a la MEP: " + alt, detector_aplica: "no",
+    puntaje_obtenido: r.pts, puntaje_maximo: r.max, porcentaje: Math.round(r.pct * 10) / 10, nota, exigencia: CONFIG.EXIGENCIA, n_criterios: r.n,
+    criticos_nivel1: r.crit.map(c => `${c.id} ${c.nom}`).join("; ") || "ninguno",
+    criterios_fortalezas: fort.map(detalle).join("\n") || "(ninguno)", criterios_mejora: mej.map(detalle).join("\n") || "(ninguno)",
+    criterios_detalle: ap.map(detalle).join("\n"), criterios_no_aplican: "ninguno", tabla_html: tablaHtml(ap),
+    trazado_patdown_texto: "Verificación del Acta (DAN 18, Anexo B): " + actaTot() + (noOk.length ? ". Campos no marcados como correctos: " + noOk.join("; ") : ". Todos los campos correctos."),
+    trazado_detector_texto: "Ficha del escenario: " + ficha.join(" | "),
+    docente_fortalezas: $("fort").value.trim(), docente_mejora: $("mejora").value.trim(), docente_compromisos: $("comp").value.trim(),
+    trazo_patdown_nombre: `verificacion_acta_${gslug}_${fdia}.png`, trazo_patdown_base64: exportarActa("Verificación del Acta de entrega de MP (DAN 18)", subt),
+    trazo_detector_nombre: `ficha_escenario_${gslug}_${fdia}.png`, trazo_detector_base64: exportarFicha("Ficha del escenario y resultado por criterio", subt, ficha)
+  };
+  const btn = $("btnEnviar"); btn.disabled = true; msg("info", "Enviando evaluación…");
+  const opts = { method: "POST", body: JSON.stringify(payload) };
+  try {
+    const res = await fetch(CONFIG.WEBHOOK_URL, { ...opts, headers: { "Content-Type": "application/json" } });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    msg("ok", "✅ Evaluación enviada. Los integrantes recibirán el resultado y la retroalimentación por correo en unos instantes.");
+  } catch (err) {
+    try { await fetch(CONFIG.WEBHOOK_URL, { ...opts, mode: "no-cors", headers: { "Content-Type": "text/plain" } }); msg("ok", "✅ Evaluación enviada (sin confirmación del servidor). Verifica en Make → History que el escenario se ejecutó."); }
+    catch (e2) { msg("err", "❌ No se pudo enviar: " + e2.message); }
+  } finally { btn.disabled = false; }
+});
+refrescar();
+</script>
+</body>
+</html>
