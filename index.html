@@ -224,8 +224,8 @@
 <script>
 /* ===================== CONFIGURACIÓN ===================== */
 const CONFIG = {
-  WEBHOOK_URL: "https://hook.us2.make.com/PEGA_AQUI_TU_WEBHOOK",
-  TOKEN: "CAMBIA_ESTE_TOKEN",
+  WEBHOOK_URL: "https://hook.us2.make.com/seqld9v9skpkm0v3vydvc9pgc4af08g9",
+  TOKEN: "apr2-a6b5f651a10a28128b4be6bb",
   EXIGENCIA: 60,
   ASIGNATURA: "Apresto al Entrenamiento en Terreno (APR) 2026 · Evaluación N° 1",
   A3_SOLO_ALEATORIO: true   // Instrucción 2 del instrumento: "en ALARMA no se puntúa [E3]"; se asumió que corresponde al criterio A3 (estado de alerta/selección). Cambiar a false si no aplica.
@@ -667,6 +667,7 @@ $("btnEnviar").addEventListener("click", async () => {
     integrantes_texto: filas.map((f, i) => `${i + 1}. ${f.nombre}${f.rol ? " — " + f.rol : ""}`).join("\n"),
     integrantes_html: "<ol style='margin:0;padding-left:18px'>" + filas.map(f => `<li>${esc(f.nombre)}${f.rol ? " — <i>" + esc(f.rol) + "</i>" : ""}</li>`).join("") + "</ol>",
     emails_destinatarios: filas.map(f => f.mail).join(","),
+    destinatarios: filas.map(f => f.mail),
     escenario_mecanismo: mec, escenario_motivo: motivo(), estado_alerta: $("alerta").value, escenario_pasajero: pax,
     elemento_persona: $("elPersona").value.trim(), elemento_equipaje: $("elEquipaje").value.trim(),
     detector_aplica: detOk ? "si" : "no",
